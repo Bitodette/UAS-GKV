@@ -7,7 +7,7 @@ public class PlayerController : MonoBehaviour
 
     private Animator anim;
     private Rigidbody2D rb; 
-    private Vector2 movement;
+    public Vector2 movement;
     private string currentAnimation = "";
 
     void Start()
