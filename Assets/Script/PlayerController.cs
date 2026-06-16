@@ -14,6 +14,8 @@ public class PlayerController : MonoBehaviour
     private string lastDirection = "depan"; 
     
     private Camera mainCam;
+    private bool isUsingTool = false;
+    private float toolTimer = 0f;
 
     void Start()
     {
@@ -27,11 +29,21 @@ public class PlayerController : MonoBehaviour
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
-        // 1. CEK KLIK MOUSE (Mengubah arah wajah saat klik kiri)
+        if (isUsingTool)
+        {
+            toolTimer -= Time.deltaTime;
+            if (toolTimer <= 0f)
+                isUsingTool = false;
+            return;
+        }
+
+        // 1. CEK KLIK MOUSE
         if (Input.GetMouseButtonDown(0))
         {
             UpdateMouseDirection();
         }
+
+        if (isUsingTool) return;
         
         // 2. LOGIKA SAAT BERGERAK (WASD)
         if (movement != Vector2.zero) 
@@ -49,17 +61,15 @@ public class PlayerController : MonoBehaviour
             else if (movement.y > 0) 
             {
                 ChangeAnimationState("jalan-atas");
-                // Catatan: jalan-atas pasangannya adalah idle-belakang
                 lastDirection = "belakang"; 
             }
             else if (movement.y < 0) 
             {
                 ChangeAnimationState("jalan-bawah");
-                // Catatan: jalan-bawah pasangannya adalah idle-depan
                 lastDirection = "depan"; 
             }
         }
-        // 3. LOGIKA SAAT DIAM (Berhenti menekan tombol)
+        // 3. LOGIKA SAAT DIAM
         else 
         {
             if (lastDirection == "kiri") ChangeAnimationState("idle-kiri");
@@ -81,7 +91,14 @@ public class PlayerController : MonoBehaviour
 
         if (Mathf.Abs(aimDirection.x) > Mathf.Abs(aimDirection.y))
         {
-            if (aimDirection.x > 0) lastDirection = "kanan";
+            if (aimDirection.x > 0)
+            {
+                lastDirection = "kanan";
+                ChangeAnimationState("nyangkul-kanan");
+                isUsingTool = true;
+                toolTimer = 1f;
+                return;
+            }
             else lastDirection = "kiri";
         }
         else
@@ -90,7 +107,6 @@ public class PlayerController : MonoBehaviour
             else lastDirection = "depan";
         }
         
-        // Jika sedang diam lalu klik mouse, langsung perbarui animasi idle-nya
         if (movement == Vector2.zero)
         {
             ChangeAnimationState("idle-" + lastDirection);
