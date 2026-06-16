@@ -81,6 +81,7 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (isUsingTool) return;
         rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
     }
 
@@ -96,7 +97,7 @@ public class PlayerController : MonoBehaviour
                 lastDirection = "kanan";
                 ChangeAnimationState("nyangkul-kanan");
                 isUsingTool = true;
-                toolTimer = 1f;
+                toolTimer = 0.35f;
                 return;
             }
             else lastDirection = "kiri";

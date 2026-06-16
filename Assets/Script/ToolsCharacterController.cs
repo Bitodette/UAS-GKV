@@ -2,16 +2,17 @@ using UnityEngine;
 
 public class ToolsCharacterController : MonoBehaviour
 {
-    PlayerController character;
     Rigidbody2D rb;
 
     [SerializeField] float offsetDistance = 1f;
     [SerializeField] float sizeOfInteractableArea = 1.2f;
 
+    Camera mainCam;
+
     void Start()
     {
-        character = GetComponent<PlayerController>();
         rb = GetComponent<Rigidbody2D>();
+        mainCam = Camera.main;
     }
 
     void Update()
@@ -24,7 +25,16 @@ public class ToolsCharacterController : MonoBehaviour
 
     private void UseTool()
     {
-        Vector2 position = rb.position + offsetDistance * character.movement.normalized;
+        Vector3 mousePosition = mainCam.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 aimDirection = mousePosition - transform.position;
+
+        Vector2 direction;
+        if (Mathf.Abs(aimDirection.x) > Mathf.Abs(aimDirection.y))
+            direction = new Vector2(Mathf.Sign(aimDirection.x), 0);
+        else
+            direction = new Vector2(0, Mathf.Sign(aimDirection.y));
+
+        Vector2 position = rb.position + offsetDistance * direction;
 
         Collider2D[] colliders =
             Physics2D.OverlapCircleAll(position, sizeOfInteractableArea);
