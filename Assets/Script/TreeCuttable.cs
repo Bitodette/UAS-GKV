@@ -4,14 +4,6 @@ using UnityEngine;
 
 public class TreeCuttable : ToolHit
 {
-<<<<<<< HEAD
-    
-    public override void Hit()
-    {
-        Destroy(gameObject);
-    }
-}
-=======
     [SerializeField] GameObject pickupDrop;
     [SerializeField] int dropCount = 5;
     [SerializeField] float spread = 1f;
@@ -37,4 +29,3 @@ public class TreeCuttable : ToolHit
         }   
     }
 }
->>>>>>> bfd6c88cc71a9593bde31b79406590fe3a5f9bc5

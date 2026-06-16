@@ -9,45 +9,92 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb; 
     public Vector2 movement;
     private string currentAnimation = "";
+    
+    // Menyimpan arah terakhir agar tahu harus idle ke arah mana saat berhenti
+    private string lastDirection = "depan"; 
+    
+    private Camera mainCam;
 
     void Start()
     {
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>(); 
+        mainCam = Camera.main; 
     }
 
     void Update()
     {
-        // Menangkap input keyboard (WASD / Panah)
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
-        // Logika animasi dengan prioritas Horizontal (Kiri/Kanan)
-        if (movement.x != 0 || movement.y != 0)
+        // 1. CEK KLIK MOUSE (Mengubah arah wajah saat klik kiri)
+        if (Input.GetMouseButtonDown(0))
         {
-            if (Input.GetKey(KeyCode.A))
+            UpdateMouseDirection();
+        }
+        
+        // 2. LOGIKA SAAT BERGERAK (WASD)
+        if (movement != Vector2.zero) 
+        {
+            if (movement.x < 0) 
             {
-                ChangeAnimationState("idle-kiri");
+                ChangeAnimationState("jalan-kiri");
+                lastDirection = "kiri";
             }
-            else if (Input.GetKey(KeyCode.D))
+            else if (movement.x > 0) 
             {
-                ChangeAnimationState("idle-kanan");
+                ChangeAnimationState("jalan-kanan");
+                lastDirection = "kanan";
             }
-            else if (Input.GetKey(KeyCode.W))
+            else if (movement.y > 0) 
             {
-                ChangeAnimationState("idle-belakang");
+                ChangeAnimationState("jalan-atas");
+                // Catatan: jalan-atas pasangannya adalah idle-belakang
+                lastDirection = "belakang"; 
             }
-            else if (Input.GetKey(KeyCode.S))
+            else if (movement.y < 0) 
             {
-                ChangeAnimationState("idle-depan");
+                ChangeAnimationState("jalan-bawah");
+                // Catatan: jalan-bawah pasangannya adalah idle-depan
+                lastDirection = "depan"; 
             }
+        }
+        // 3. LOGIKA SAAT DIAM (Berhenti menekan tombol)
+        else 
+        {
+            if (lastDirection == "kiri") ChangeAnimationState("idle-kiri");
+            else if (lastDirection == "kanan") ChangeAnimationState("idle-kanan");
+            else if (lastDirection == "belakang") ChangeAnimationState("idle-belakang");
+            else if (lastDirection == "depan") ChangeAnimationState("idle-depan");
         }
     }
 
     void FixedUpdate()
     {
-        // Pergerakan fisika tetap berjalan ke semua arah (termasuk serong)
         rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
+    }
+
+    void UpdateMouseDirection()
+    {
+        Vector3 mousePosition = mainCam.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 aimDirection = mousePosition - transform.position;
+
+        if (Mathf.Abs(aimDirection.x) > Mathf.Abs(aimDirection.y))
+        {
+            if (aimDirection.x > 0) lastDirection = "kanan";
+            else lastDirection = "kiri";
+        }
+        else
+        {
+            if (aimDirection.y > 0) lastDirection = "belakang";
+            else lastDirection = "depan";
+        }
+        
+        // Jika sedang diam lalu klik mouse, langsung perbarui animasi idle-nya
+        if (movement == Vector2.zero)
+        {
+            ChangeAnimationState("idle-" + lastDirection);
+        }
     }
 
     void ChangeAnimationState(string newAnimation)
