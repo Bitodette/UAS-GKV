@@ -364,6 +364,7 @@ GameObject:
   - component: {fileID: 539465295}
   - component: {fileID: 539465297}
   - component: {fileID: 539465296}
+  - component: {fileID: 539465298}
   m_Layer: 0
   m_Name: Daun
   m_TagString: Untagged
@@ -471,7 +472,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 5
   m_Sprite: {fileID: 8145851837933321786, guid: 31e0188b42f127e498d9d6e0c4f1515a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -483,6 +484,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &539465298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 539465294}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8a078ba8da71604e802a518f61ecda0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  transparentAlpha: 0.5
+  fadeSpeed: 5
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
@@ -707,9 +722,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d21e1cdda21fb014893f21ebedaafb37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pickupDrop: {fileID: 0}
+  treeHealth: 3
+  woodPrefab: {fileID: 0}
   dropCount: 5
-  spread: 1
+  wholeTreeObject: {fileID: 0}
 --- !u!1 &982339090
 GameObject:
   m_ObjectHideFlags: 0
@@ -5888,6 +5904,7 @@ GameObject:
   - component: {fileID: 1195923447}
   - component: {fileID: 1195923449}
   - component: {fileID: 1195923448}
+  - component: {fileID: 1195923450}
   m_Layer: 0
   m_Name: Batang
   m_TagString: Untagged
@@ -5942,7 +5959,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.028902292, y: 0.26424766}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -5953,7 +5970,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 2.875, y: 1.25}
+  m_Size: {x: 1.1161022, y: 0.7215047}
   m_EdgeRadius: 0
 --- !u!212 &1195923449
 SpriteRenderer:
@@ -6007,11 +6024,22 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1 &1904422054 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5197513698089741005, guid: fd628cf16d5ad0a47ae3748d0a08250a, type: 3}
-  m_PrefabInstance: {fileID: 284947628}
+--- !u!114 &1195923450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1195923446}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d21e1cdda21fb014893f21ebedaafb37, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  treeHealth: 3
+  woodPrefab: {fileID: 5197513698089741005, guid: fd628cf16d5ad0a47ae3748d0a08250a, type: 3}
+  dropCount: 3
+  wholeTreeObject: {fileID: 0}
 --- !u!1 &1990053514
 GameObject:
   m_ObjectHideFlags: 0
@@ -6155,9 +6183,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d21e1cdda21fb014893f21ebedaafb37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pickupDrop: {fileID: 1904422054}
+  treeHealth: 3
+  woodPrefab: {fileID: 0}
   dropCount: 5
-  spread: 1
+  wholeTreeObject: {fileID: 0}
 --- !u!1 &2041105306
 GameObject:
   m_ObjectHideFlags: 0
@@ -6172,9 +6201,10 @@ GameObject:
   - component: {fileID: 2041105311}
   - component: {fileID: 2041105313}
   - component: {fileID: 2041105314}
+  - component: {fileID: 2041105315}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6307,7 +6337,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!114 &2041105314
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6322,6 +6352,51 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   offsetDistance: 1
   sizeOfInteractableArea: 1.2
+--- !u!61 &2041105315
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2041105306}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0.16974664}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.49999997, y: -0.33333334}
+    oldSize: {x: 0.25, y: 0.39}
+    newSize: {x: 0.25, y: 0.39}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.25, y: 0.07949339}
+  m_EdgeRadius: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
