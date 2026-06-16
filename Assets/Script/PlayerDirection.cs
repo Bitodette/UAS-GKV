@@ -26,8 +26,11 @@ public class PlayerDirection : MonoBehaviour
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
-        // 2. LOGIKA ARAH WAJAH (Berdasarkan kursor mouse)
-        UpdateFacingDirection();
+        // 2. LOGIKA ARAH WAJAH (Hanya saat klik kiri mouse)
+        if (Input.GetMouseButtonDown(0))
+        {
+            UpdateFacingDirection();
+        }
     }
 
     void FixedUpdate()
