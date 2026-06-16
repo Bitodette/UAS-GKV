@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PickupItem : MonoBehaviour
@@ -10,26 +8,18 @@ public class PickupItem : MonoBehaviour
     [SerializeField] float timeToLive = 10f;
 
     private void Start()
-{
-    player = GameObject.Find("Player").transform;
-
-    Debug.Log("PLAYER FOUND = " + player);
-}
+    {
+        player = GameManager.Instance.player.transform;
+        Destroy(gameObject, timeToLive);
+    }
 
     private void Update()
     {
-        Debug.Log("player = " + player);
-
-        if (player == null)
-        {
-            Debug.LogError("player NULL");
-            return;
-        }
+        if (player == null) return;
 
         float distance = Vector2.Distance(transform.position, player.position);
 
-        if (distance > pickupRange)
-            return;
+        if (distance > pickupRange) return;
 
         transform.position = Vector3.MoveTowards(
             transform.position,

@@ -1,31 +1,69 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class TreeCuttable : ToolHit
+public class TreeCuttable : MonoBehaviour
 {
-    [SerializeField] GameObject pickupDrop;
-    [SerializeField] int dropCount = 5;
-    [SerializeField] float spread = 1f;
+    [Header("Statistik Pohon")]
+    public int treeHealth = 3;
+    public GameObject woodPrefab;
+    public int dropCount = 3;
 
-    public override void Hit()
+    [Header("Referensi")]
+    public GameObject wholeTreeObject;
+
+    private bool isDestroyed = false;
+
+    void Start()
     {
-        if (pickupDrop == null)
+        if (wholeTreeObject == null)
+            wholeTreeObject = transform.parent.gameObject;
+    }
+
+
+    void OnMouseDown()
+    {
+        if (isDestroyed) return;
+
+        GameObject player = GameManager.Instance.player;
+        if (player != null)
         {
-            Debug.LogError("Pickup Drop belum diassign!");
-            return;
+            float distance = Vector2.Distance(transform.position, player.transform.position);
+            if (distance > 2f) return;
         }
+
+        TakeDamage();
+    }
+
+    void TakeDamage()
+    {
+        treeHealth--;
+
+        wholeTreeObject.transform.localScale = new Vector3(1.1f, 1.1f, 1f);
+        Invoke("ResetScale", 0.08f);
+
+        if (treeHealth <= 0)
+        {
+            DestroyTree();
+        }
+    }
+
+    void ResetScale()
+    {
+        if (wholeTreeObject != null)
+        {
+            wholeTreeObject.transform.localScale = Vector3.one;
+        }
+    }
+
+    void DestroyTree()
+    {
+        isDestroyed = true;
 
         for (int i = 0; i < dropCount; i++)
         {
-            Vector3 pos = transform.position;
+            Vector3 spawnOffset = new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
+            Instantiate(woodPrefab, transform.position + spawnOffset, Quaternion.identity);
+        }
 
-            pos.x += Random.Range(-spread / 2f, spread / 2f);
-            pos.y += Random.Range(-spread / 2f, spread / 2f);
-
-            Instantiate(pickupDrop, pos, Quaternion.identity);
-
-        Destroy(gameObject);
-        }   
+        Destroy(wholeTreeObject);
     }
 }
