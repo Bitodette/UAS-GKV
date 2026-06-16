@@ -7,6 +7,10 @@ public class PickupItem : MonoBehaviour
     [SerializeField] float pickupRange = 1f;
     [SerializeField] float timeToLive = 10f;
 
+    [Header("Item Info")]
+    public Sprite itemIcon;
+    public string itemName = "Wood";
+
     private void Start()
     {
         player = GameManager.Instance.player.transform;
@@ -29,6 +33,8 @@ public class PickupItem : MonoBehaviour
 
         if (distance < 0.1f)
         {
+            if (SlotbarManager.Instance != null)
+                SlotbarManager.Instance.AddItem(itemIcon, itemName);
             Destroy(gameObject);
         }
     }
