@@ -5,8 +5,28 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
-   public void PlayGame()
-   {
-       SceneManager.LoadScene(1);
-   }
+    // BARIS INI YANG KURANG. Tanpa ini, Unity gak tahu apa itu 'optionPanel'
+    [SerializeField] private GameObject optionPanel; 
+
+    // Fungsi pindah scene lu tetap aman di sini
+    public void PlayGame()
+    {
+        SceneManager.LoadScene(1);
+    }
+
+    public void OpenOption()
+    {
+        if (optionPanel != null)
+        {
+            optionPanel.SetActive(true); // Menyalakan overlay
+        }
+    }
+
+    public void CloseOption()
+    {
+        if (optionPanel != null)
+        {
+            optionPanel.SetActive(false); // Mematikan overlay
+        }
+    }
 }
