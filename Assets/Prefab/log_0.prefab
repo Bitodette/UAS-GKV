@@ -100,5 +100,6 @@ MonoBehaviour:
   speed: 5
   pickupRange: 1
   timeToLive: 10
+  itemData: {fileID: 11400000, guid: e8a3f7c2d1b9450684f07e3c92a5d618, type: 2}
   itemIcon: {fileID: -1378191539, guid: 019c10f68adde11439ef8475f257e255, type: 3}
   itemName: Wood

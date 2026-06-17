@@ -25,6 +25,12 @@ public class ToolsCharacterController : MonoBehaviour
 
     private void UseTool()
     {
+        HotbarManager hotbar = FindFirstObjectByType<HotbarManager>();
+        if (hotbar != null && hotbar.SelectedItem != null)
+        {
+            Debug.Log("Using item: " + hotbar.SelectedItem.itemName);
+        }
+
         Vector3 mousePosition = mainCam.ScreenToWorldPoint(Input.mousePosition);
         Vector2 aimDirection = mousePosition - transform.position;
 

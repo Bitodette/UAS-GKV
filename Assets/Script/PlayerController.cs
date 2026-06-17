@@ -34,7 +34,6 @@ public class PlayerController : MonoBehaviour
             toolTimer -= Time.deltaTime;
             if (toolTimer <= 0f)
                 isUsingTool = false;
-            return;
         }
 
         // 1. CEK KLIK MOUSE
@@ -43,8 +42,6 @@ public class PlayerController : MonoBehaviour
             UpdateMouseDirection();
         }
 
-        if (isUsingTool) return;
-        
         // 2. LOGIKA SAAT BERGERAK (WASD)
         if (movement != Vector2.zero) 
         {
@@ -81,7 +78,6 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (isUsingTool) return;
         rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
     }
 
