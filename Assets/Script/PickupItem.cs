@@ -5,7 +5,7 @@ public class PickupItem : MonoBehaviour
     Transform player;
     [SerializeField] float speed = 5f;
     [SerializeField] float pickupRange = 1f;
-    [SerializeField] float timeToLive = 10f;
+    [SerializeField] float timeToLive = 30f;
 
     [Header("Item Info")]
     public Sprite itemIcon;
