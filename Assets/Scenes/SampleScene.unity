@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4aed0dc5331f84e7e8a1b9e80d4e0a5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offset: {x: 0, y: 0, z: -10}
+  offset: {x: 0, y: 1, z: -10}
   smoothSpeed: 5
 --- !u!29 &1
 OcclusionCullingSettings:
@@ -6118,8 +6118,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   treeHealth: 3
-  woodPrefab: {fileID: 5197513698089741005, guid: fd628cf16d5ad0a47ae3748d0a08250a, type: 3}
-  dropCount: 3
+  minHealth: 2
+  maxHealth: 4
+  woodPrefabs:
+  - {fileID: 5197513698089741005, guid: fd628cf16d5ad0a47ae3748d0a08250a, type: 3}
+  minDrop: 2
+  maxDrop: 5
   wholeTreeObject: {fileID: 0}
 --- !u!1 &1719134161
 GameObject:
