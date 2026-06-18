@@ -1,12 +1,63 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 
-public class SlotUI : MonoBehaviour
+public class SlotUI : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] private Image iconImage;
     [SerializeField] private TMP_Text countText;
-    [SerializeField] private GameObject highlightObj;
+
+    private Image slotImage;
+    private Sprite defaultSprite;
+    private Color defaultColor;
+    private Sprite selectedSprite;
+    private int slotIndex;
+
+    void Awake()
+    {
+        slotImage = GetComponent<Image>();
+        if (slotImage != null)
+        {
+            defaultSprite = slotImage.sprite;
+            defaultColor = slotImage.color;
+        }
+
+        Transform hl = transform.Find("HighLight");
+        if (hl != null)
+            hl.gameObject.SetActive(false);
+
+        if (selectedSprite == null)
+        {
+            Sprite[] all = Resources.FindObjectsOfTypeAll<Sprite>();
+            foreach (Sprite s in all)
+            {
+                if (s.name == "slotbar 1_1")
+                {
+                    selectedSprite = s;
+                    break;
+                }
+            }
+        }
+    }
+
+    public void SetSlotIndex(int index)
+    {
+        slotIndex = index;
+    }
+
+    public void SetSelectedSprite(Sprite sprite)
+    {
+        if (sprite != null)
+            selectedSprite = sprite;
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        HotbarManager hotbar = FindFirstObjectByType<HotbarManager>();
+        if (hotbar != null)
+            hotbar.SetSelected(slotIndex);
+    }
 
     public void UpdateSlot(ItemData item, int count)
     {
@@ -14,6 +65,8 @@ public class SlotUI : MonoBehaviour
         if (item != null)
         {
             iconImage.sprite = item.icon;
+            iconImage.preserveAspect = true;
+            iconImage.gameObject.SetActive(true);
             iconImage.enabled = true;
             countText.text = count > 1 ? count.ToString() : "";
             countText.gameObject.SetActive(true);
@@ -21,24 +74,26 @@ public class SlotUI : MonoBehaviour
         else
         {
             iconImage.sprite = null;
+            iconImage.gameObject.SetActive(false);
             iconImage.enabled = false;
             countText.text = "";
             countText.gameObject.SetActive(false);
         }
     }
 
-    public void ToggleHighlight(bool isActive)
-    {
-        SetHighlight(isActive);
-    }
-
     public void SetHighlight(bool isActive)
     {
-        Debug.Log("[SlotUI] SetHighlight called. isActive=" + isActive + " | highlightObj=" + (highlightObj != null ? highlightObj.name : "NULL"));
-        if (highlightObj != null)
+        if (slotImage == null) return;
+
+        if (isActive && selectedSprite != null)
         {
-            highlightObj.SetActive(isActive);
-            Debug.Log("[SlotUI] highlightObj.SetActive(" + isActive + ") called. activeSelf=" + highlightObj.activeSelf + " activeInHierarchy=" + highlightObj.activeInHierarchy);
+            slotImage.sprite = selectedSprite;
+            slotImage.color = Color.white;
+        }
+        else
+        {
+            slotImage.sprite = defaultSprite;
+            slotImage.color = defaultColor;
         }
     }
 }
