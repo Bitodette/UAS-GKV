@@ -7,9 +7,12 @@ public class TilemapReadController : MonoBehaviour
 {
     [SerializeField] private Tilemap tilemap;
     [SerializeField] private List<TileData> tileDatas;
-    [SerializeField] private float useRange = 3f;
+    [SerializeField] private int useRange = 1;
 
     private Dictionary<TileBase, TileData> dataFromTiles;
+    private SpriteRenderer highlightSprite;
+    private Vector3Int lastHighlightPos;
+    private bool isHighlighted = false;
 
     private void Start()
     {
@@ -23,15 +26,73 @@ public class TilemapReadController : MonoBehaviour
                     dataFromTiles.Add(tile, tileData);
             }
         }
+
+        GameObject hlObj = new GameObject("TileHighlight");
+        hlObj.transform.SetParent(transform);
+        highlightSprite = hlObj.AddComponent<SpriteRenderer>();
+        highlightSprite.sortingOrder = 10;
+        highlightSprite.color = new Color(1, 1, 0, 0.5f);
+        highlightSprite.sprite = CreateBorderSprite();
+        highlightSprite.gameObject.SetActive(false);
+    }
+
+    private Sprite CreateBorderSprite()
+    {
+        int size = 32;
+        Texture2D tex = new Texture2D(size, size);
+        Color clear = Color.clear;
+        Color yellow = Color.yellow;
+
+        for (int x = 0; x < size; x++)
+        {
+            for (int y = 0; y < size; y++)
+            {
+                bool border = x == 0 || x == size - 1 || y == 0 || y == size - 1;
+                tex.SetPixel(x, y, border ? yellow : clear);
+            }
+        }
+        tex.Apply();
+        tex.filterMode = FilterMode.Point;
+        return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), size);
     }
 
     private void Update()
     {
+        UpdateHighlight();
+
         if (IsPointerOverUI()) return;
 
         if (Input.GetMouseButtonDown(0))
         {
             TryUseTile(Input.mousePosition);
+        }
+    }
+
+    private void UpdateHighlight()
+    {
+        Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        worldPos.z = 0;
+        Vector3Int gridPos = tilemap.WorldToCell(worldPos);
+        Vector3Int playerGrid = tilemap.WorldToCell(GetPlayerPosition());
+        int dx = Mathf.Abs(gridPos.x - playerGrid.x);
+        int dy = Mathf.Abs(gridPos.y - playerGrid.y);
+        bool inRange = dx <= useRange && dy <= useRange && tilemap.GetTile(gridPos) != null;
+
+        if (isHighlighted && gridPos == lastHighlightPos && inRange) return;
+
+        if (isHighlighted)
+        {
+            highlightSprite.gameObject.SetActive(false);
+            isHighlighted = false;
+        }
+
+        if (inRange)
+        {
+            Vector3 tileCenter = tilemap.GetCellCenterWorld(gridPos);
+            highlightSprite.transform.position = tileCenter;
+            highlightSprite.gameObject.SetActive(true);
+            lastHighlightPos = gridPos;
+            isHighlighted = true;
         }
     }
 
@@ -45,8 +106,10 @@ public class TilemapReadController : MonoBehaviour
 
         if (tileBase == null) return;
 
-        float dist = Vector2.Distance(worldPosition, GetPlayerPosition());
-        if (dist > useRange) return;
+        Vector3Int playerGridPos = tilemap.WorldToCell(GetPlayerPosition());
+        int dx = Mathf.Abs(gridPosition.x - playerGridPos.x);
+        int dy = Mathf.Abs(gridPosition.y - playerGridPos.y);
+        if (dx > useRange || dy > useRange) return;
 
         Debug.Log("Tile in position = " + gridPosition + " is " + tileBase);
     }

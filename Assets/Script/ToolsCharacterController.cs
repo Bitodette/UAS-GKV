@@ -6,6 +6,7 @@ public class ToolsCharacterController : MonoBehaviour
 
     [SerializeField] float offsetDistance = 1f;
     [SerializeField] float sizeOfInteractableArea = 1.2f;
+    [SerializeField] float maxUseDistance = 3f;
 
     Camera mainCam;
 
@@ -25,13 +26,16 @@ public class ToolsCharacterController : MonoBehaviour
 
     private void UseTool()
     {
+        Vector3 mousePosition = mainCam.ScreenToWorldPoint(Input.mousePosition);
+        float dist = Vector2.Distance(mousePosition, transform.position);
+        if (dist > maxUseDistance) return;
+
         HotbarManager hotbar = FindFirstObjectByType<HotbarManager>();
         if (hotbar != null && hotbar.SelectedItem != null)
         {
             Debug.Log("Using item: " + hotbar.SelectedItem.itemName);
         }
 
-        Vector3 mousePosition = mainCam.ScreenToWorldPoint(Input.mousePosition);
         Vector2 aimDirection = mousePosition - transform.position;
 
         Vector2 direction;

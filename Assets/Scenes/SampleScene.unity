@@ -2484,7 +2484,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tilemap: {fileID: 1186464416}
-  useRange: 3
+  tileDatas: []
+  useRange: 1
 --- !u!1 &1001033810
 GameObject:
   m_ObjectHideFlags: 0
@@ -27225,7 +27226,7 @@ Transform:
   m_GameObject: {fileID: 2041105306}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.62, y: -2.15, z: 0}
+  m_LocalPosition: {x: 0.02, y: -1.25, z: 0}
   m_LocalScale: {x: 3.6458, y: 3.6458, z: 3.6458}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -27286,6 +27287,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   offsetDistance: 1
   sizeOfInteractableArea: 1.2
+  maxUseDistance: 3
 --- !u!61 &2041105315
 BoxCollider2D:
   m_ObjectHideFlags: 0

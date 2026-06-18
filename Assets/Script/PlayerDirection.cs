@@ -46,6 +46,7 @@ public class PlayerDirection : MonoBehaviour
         
         // Mencari vektor arah dari player ke mouse
         Vector2 aimDirection = mousePosition - transform.position;
+        if (aimDirection.magnitude > 3f) return;
 
         // Membandingkan jarak X dan Y untuk menentukan arah mana yang lebih dominan
         if (Mathf.Abs(aimDirection.x) > Mathf.Abs(aimDirection.y))

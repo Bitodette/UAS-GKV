@@ -33,13 +33,19 @@ public class PlayerController : MonoBehaviour
         {
             toolTimer -= Time.deltaTime;
             if (toolTimer <= 0f)
+            {
                 isUsingTool = false;
+                if (movement == Vector2.zero)
+                    ChangeAnimationState("idle-" + lastDirection);
+            }
+            return;
         }
 
         // 1. CEK KLIK MOUSE
         if (Input.GetMouseButtonDown(0))
         {
             UpdateMouseDirection();
+            if (isUsingTool) return;
         }
 
         // 2. LOGIKA SAAT BERGERAK (WASD)
@@ -85,6 +91,8 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 mousePosition = mainCam.ScreenToWorldPoint(Input.mousePosition);
         Vector2 aimDirection = mousePosition - transform.position;
+        float dist = aimDirection.magnitude;
+        if (dist > 3f) return;
 
         if (Mathf.Abs(aimDirection.x) > Mathf.Abs(aimDirection.y))
         {
