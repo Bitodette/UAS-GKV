@@ -18,6 +18,9 @@ public class TilemapReadController : MonoBehaviour
     {
         dataFromTiles = new Dictionary<TileBase, TileData>();
 
+        if (tilemap == null)
+            tilemap = FindFirstObjectByType<Tilemap>();
+
         foreach (TileData tileData in tileDatas)
         {
             foreach (TileBase tile in tileData.tiles)
@@ -70,6 +73,7 @@ public class TilemapReadController : MonoBehaviour
 
     private void UpdateHighlight()
     {
+        if (tilemap == null) return;
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         worldPos.z = 0;
         Vector3Int gridPos = tilemap.WorldToCell(worldPos);
