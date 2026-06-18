@@ -2484,7 +2484,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tilemap: {fileID: 1186464416}
-  tileDatas: []
+  tileDatas:
+  - {fileID: 11400000, guid: 18e665539a4abd84c9db90fee11b4688, type: 2}
+  - {fileID: 11400000, guid: 91793fe19b86f8846ad6867913f88e5b, type: 2}
   useRange: 1
 --- !u!1 &1001033810
 GameObject:
