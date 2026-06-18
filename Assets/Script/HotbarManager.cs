@@ -96,7 +96,10 @@ public class HotbarManager : MonoBehaviour
         for (int i = 0; i < uiSlots.Length; i++)
         {
             if (uiSlots[i] != null)
+            {
                 uiSlots[i].SetSlotIndex(i);
+                uiSlots[i].SetSelectedSprite(selectedSlotSprite);
+            }
         }
 
         UpdateHighlightVisual();
@@ -168,18 +171,49 @@ public class HotbarManager : MonoBehaviour
         UpdateHighlightVisual();
     }
 
+    public void SwapSlot(int fromIndex, int toIndex)
+    {
+        if (fromIndex < 0 || fromIndex >= hotbarSize || toIndex < 0 || toIndex >= hotbarSize)
+            return;
+        if (fromIndex == toIndex) return;
+
+        ItemData tempItem = inventoryItems[fromIndex];
+        int tempCount = itemCounts[fromIndex];
+
+        inventoryItems[fromIndex] = inventoryItems[toIndex];
+        itemCounts[fromIndex] = itemCounts[toIndex];
+
+        inventoryItems[toIndex] = tempItem;
+        itemCounts[toIndex] = tempCount;
+    }
+
+    public ItemData GetItem(int index)
+    {
+        if (index < 0 || index >= hotbarSize) return null;
+        return inventoryItems[index];
+    }
+
+    public int GetItemCount(int index)
+    {
+        if (index < 0 || index >= hotbarSize) return 0;
+        return itemCounts[index];
+    }
+
+    public void SetItem(int index, ItemData item, int count)
+    {
+        if (index < 0 || index >= hotbarSize) return;
+        inventoryItems[index] = item;
+        itemCounts[index] = count;
+    }
+
     void UpdateHighlightVisual()
     {
-        Debug.Log("[HotbarManager] UpdateHighlightVisual called. selectedIndex=" + selectedIndex + " | uiSlots length=" + (uiSlots?.Length ?? -1));
         for (int i = 0; i < uiSlots.Length; i++)
         {
             if (uiSlots[i] != null)
             {
-                uiSlots[i].SetHighlight(i == selectedIndex);
-            }
-            else
-            {
-                Debug.Log("[HotbarManager] uiSlots[" + i + "] is NULL!");
+                // PASTIKAN memanggil SetHighlight, BUKAN ToggleHighlight
+                uiSlots[i].SetHighlight(i == selectedIndex); 
             }
         }
     }
