@@ -1,18 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class MarkerManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField] private Tilemap targetTilemap;
+    [SerializeField] private TileBase tile;
 
-    // Update is called once per frame
-    void Update()
+    public Vector3Int markedCellPosition;
+
+    private Vector3Int oldCellPosition;
+    private bool hasOldPosition = false;
+
+    private void Update()
     {
-        
+        if (hasOldPosition && oldCellPosition != markedCellPosition)
+        {
+            targetTilemap.SetTile(oldCellPosition, null);
+        }
+
+        targetTilemap.SetTile(markedCellPosition, tile);
+
+        oldCellPosition = markedCellPosition;
+        hasOldPosition = true;
     }
 }
