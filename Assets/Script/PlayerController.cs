@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
     
     private Camera mainCam;
     private TilemapReadController tilemapReadController;
+    private CropsManager cropsManager;
     private bool isUsingTool = false;
     private float toolTimer = 0f;
     private bool toolFirstFrame = true;
@@ -24,6 +25,8 @@ public class PlayerController : MonoBehaviour
     private Vector3Int walkIntermediateGrid;
     private Vector3Int walkFinalGrid;
 
+    private Vector3Int? pendingPlowPos;
+
     void Start()
     {
         anim = GetComponent<Animator>();
@@ -31,6 +34,7 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>(); 
         mainCam = Camera.main; 
         tilemapReadController = FindFirstObjectByType<TilemapReadController>();
+        cropsManager = FindFirstObjectByType<CropsManager>();
     }
 
     void Update()
@@ -75,6 +79,11 @@ public class PlayerController : MonoBehaviour
                 {
                     isUsingTool = false;
                     toolFirstFrame = true;
+                    if (pendingPlowPos.HasValue && cropsManager != null)
+                    {
+                        cropsManager.Plow(pendingPlowPos.Value);
+                        pendingPlowPos = null;
+                    }
                     if (movement == Vector2.zero)
                         ChangeAnimationState("idle-" + lastDirection);
                 }
@@ -90,35 +99,44 @@ public class PlayerController : MonoBehaviour
             if (inRange && tilemapReadController != null)
             {
                 Vector3Int gridPos = tilemapReadController.GetMouseGridPosition();
-                Vector3Int playerGrid = tilemapReadController.GetPlayerGridPosition();
-                Vector3Int delta = gridPos - playerGrid;
 
-                if (gridPos == playerGrid)
-                {
-                    lastDirection = "depan";
-                    ChangeAnimationState("nyangkul-depan");
-                    isUsingTool = true;
-                }
-                else if (delta.x != 0 && delta.y != 0)
-                {
-                    HandleDiagonalClick();
-                }
-                else if (delta.y != 0)
-                {
-                    // Atas/bawah — jalan ke tile dulu, baru tool
-                    walkIntermediateGrid = playerGrid;
-                    walkFinalGrid = gridPos;
-                    walkTarget = tilemapReadController.GridToWorldFeet(gridPos);
-                    walkTarget.z = 0;
-                    isWalkingToTarget = true;
-
-                    if (delta.y > 0) { lastDirection = "belakang"; ChangeAnimationState("jalan-atas"); }
-                    else { lastDirection = "depan"; ChangeAnimationState("jalan-bawah"); }
-                }
+                // Cek apakah tile ini bisa di-plow
+                bool canPlow = tilemapReadController.CanPlowAt(gridPos);
+                if (canPlow)
+                    pendingPlowPos = gridPos;
                 else
+                    pendingPlowPos = null;
+
+                if (canPlow)
                 {
-                    // Kiri/kanan — langsung di tempat
-                    UpdateMouseDirection();
+                    Vector3Int playerGrid = tilemapReadController.GetPlayerGridPosition();
+                    Vector3Int delta = gridPos - playerGrid;
+
+                    if (gridPos == playerGrid)
+                    {
+                        lastDirection = "depan";
+                        ChangeAnimationState("nyangkul-depan");
+                        isUsingTool = true;
+                    }
+                    else if (delta.x != 0 && delta.y != 0)
+                    {
+                        HandleDiagonalClick();
+                    }
+                    else if (delta.y != 0)
+                    {
+                        walkIntermediateGrid = playerGrid;
+                        walkFinalGrid = gridPos;
+                        walkTarget = tilemapReadController.GridToWorldFeet(gridPos);
+                        walkTarget.z = 0;
+                        isWalkingToTarget = true;
+
+                        if (delta.y > 0) { lastDirection = "belakang"; ChangeAnimationState("jalan-atas"); }
+                        else { lastDirection = "depan"; ChangeAnimationState("jalan-bawah"); }
+                    }
+                    else
+                    {
+                        UpdateMouseDirection();
+                    }
                 }
                 if (isUsingTool || isWalkingToTarget) return;
             }

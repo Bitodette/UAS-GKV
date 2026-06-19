@@ -12,6 +12,7 @@ public class CropsManager : MonoBehaviour
     [SerializeField] private Sprite plowedSprite;
     [SerializeField] private TileBase seeded;
     [SerializeField] private Tilemap targetTilemap;
+    [SerializeField] private Tilemap seedTilemap;
 
     private Dictionary<Vector3Int, Crops> crops;
     private TileBase plowedTile;
@@ -43,9 +44,6 @@ public class CropsManager : MonoBehaviour
 
     public void Plow(Vector3Int position)
     {
-        System.Diagnostics.StackTrace st = new System.Diagnostics.StackTrace();
-        Debug.Log($"Plow DIPANGGIL pos=({position.x},{position.y})\n" + st.ToString());
-
         if (crops.ContainsKey(position))
             return;
 
@@ -54,7 +52,13 @@ public class CropsManager : MonoBehaviour
 
     public void Seed(Vector3Int position)
     {
-        targetTilemap.SetTile(position, seeded);
+        if (!crops.ContainsKey(position))
+            return;
+
+        if (seedTilemap != null)
+            seedTilemap.SetTile(position, seeded);
+        else
+            targetTilemap.SetTile(position, seeded);
     }
 
     private void CreatePlowedTile(Vector3Int position)

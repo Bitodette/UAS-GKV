@@ -7,6 +7,8 @@ using UnityEngine.EventSystems;
 public class TilemapReadController : MonoBehaviour
 {
     [SerializeField] private Tilemap tilemap;
+    [SerializeField] private Tilemap highlightTilemap;
+    [SerializeField] private Tilemap groundTilemap;
     [SerializeField] private List<TileData> tileDatas;
     [SerializeField] private TileData plowableData;
     [SerializeField] private TileData nonPlowableData;
@@ -100,8 +102,8 @@ public class TilemapReadController : MonoBehaviour
     private void Update()
     {
         if (tilemap == null) return;
+        Tilemap hlMap = highlightTilemap != null ? highlightTilemap : tilemap;
 
-        // Cek apakah tools/cangkul yang di-select
         bool toolSelected = hotbar != null && hotbar.SelectedItem != null && hotbar.SelectedItem.itemName == "tools";
         if (!toolSelected)
         {
@@ -120,28 +122,13 @@ public class TilemapReadController : MonoBehaviour
         Vector3Int playerGrid = GetPlayerGridPosition();
         int dx = Mathf.Abs(gridPos.x - playerGrid.x);
         int dy = Mathf.Abs(gridPos.y - playerGrid.y);
-        bool inRange = dx <= useRange && dy <= useRange && tilemap.GetTile(gridPos) != null;
+        bool inRange = dx <= useRange && dy <= useRange && hlMap.GetTile(gridPos) != null;
 
-        // KLIK — PAKAI inRange YANG SAMA PERSIS DENGAN HIGHLIGHT
         if (!IsPointerOverUI() && Input.GetMouseButtonDown(0))
         {
-            Debug.Log($"Klik grid=({gridPos.x},{gridPos.y}) playerGrid=({playerGrid.x},{playerGrid.y}) dx={dx} dy={dy} range={useRange} adaTile={tilemap.GetTile(gridPos) != null} inRange={inRange}");
-
-            if (inRange && cropsManager != null)
-            {
-                TileData tileData = GetTileData(tilemap.GetTile(gridPos));
-                bool alreadyPlowed = cropsManager.Check(gridPos);
-                Debug.Log($"→ Klik: alreadyPlowed={alreadyPlowed} tileData={tileData != null} plowable={(tileData == null || tileData.plowable)}");
-                if (!alreadyPlowed && (tileData == null || tileData.plowable))
-                    cropsManager.Plow(gridPos);
-            }
-            else
-            {
-                Debug.Log($"→ TIDAK action. inRange={inRange} cropsManager={cropsManager != null}");
-            }
+            Debug.Log($"Klik grid=({gridPos.x},{gridPos.y}) playerGrid=({playerGrid.x},{playerGrid.y}) dx={dx} dy={dy} range={useRange} adaTile={hlMap.GetTile(gridPos) != null} inRange={inRange}");
         }
 
-        // HIGHLIGHT
         if (isHighlighted && gridPos == lastHighlightPos && inRange) return;
 
         if (isHighlighted)
@@ -152,7 +139,7 @@ public class TilemapReadController : MonoBehaviour
 
         if (inRange)
         {
-            Vector3 tileCenter = tilemap.GetCellCenterWorld(gridPos);
+            Vector3 tileCenter = hlMap.GetCellCenterWorld(gridPos);
             highlightSprite.transform.position = tileCenter;
             highlightSprite.gameObject.SetActive(true);
             lastHighlightPos = gridPos;
@@ -235,5 +222,18 @@ public class TilemapReadController : MonoBehaviour
     public bool IsToolSelected()
     {
         return hotbar != null && hotbar.SelectedItem != null && hotbar.SelectedItem.itemName == "tools";
+    }
+
+    public bool CanPlowAt(Vector3Int gridPos)
+    {
+        if (tilemap == null || cropsManager == null) return false;
+        if (cropsManager.Check(gridPos)) return false;
+        TileData tileData = GetTileData(tilemap.GetTile(gridPos));
+        return tileData == null || tileData.plowable;
+    }
+
+    public bool IsAlreadyPlowed(Vector3Int gridPos)
+    {
+        return cropsManager != null && cropsManager.Check(gridPos);
     }
 }
