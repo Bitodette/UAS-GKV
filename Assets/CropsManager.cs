@@ -26,6 +26,9 @@ public class CropsManager : MonoBehaviour
 
     public void Plow(Vector3Int position)
     {
+        System.Diagnostics.StackTrace st = new System.Diagnostics.StackTrace();
+        Debug.Log($"Plow DIPANGGIL pos=({position.x},{position.y})\n" + st.ToString());
+
         if (crops.ContainsKey(position))
             return;
 

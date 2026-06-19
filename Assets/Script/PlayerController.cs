@@ -6,22 +6,31 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed = 5f;
 
     private Animator anim;
+    private SpriteRenderer spriteRenderer;
     private Rigidbody2D rb; 
     public Vector2 movement;
     private string currentAnimation = "";
     
-    // Menyimpan arah terakhir agar tahu harus idle ke arah mana saat berhenti
     private string lastDirection = "depan"; 
     
     private Camera mainCam;
+    private TilemapReadController tilemapReadController;
     private bool isUsingTool = false;
     private float toolTimer = 0f;
+    private bool toolFirstFrame = true;
+
+    private bool isWalkingToTarget = false;
+    private Vector3 walkTarget;
+    private Vector3Int walkIntermediateGrid;
+    private Vector3Int walkFinalGrid;
 
     void Start()
     {
         anim = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>(); 
         mainCam = Camera.main; 
+        tilemapReadController = FindFirstObjectByType<TilemapReadController>();
     }
 
     void Update()
@@ -29,26 +38,76 @@ public class PlayerController : MonoBehaviour
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
-        if (isUsingTool)
+        // JALAN KE TARGET (sebelum tool action)
+        if (isWalkingToTarget)
         {
-            toolTimer -= Time.deltaTime;
-            if (toolTimer <= 0f)
+            transform.position = Vector3.MoveTowards(transform.position, walkTarget, moveSpeed * Time.deltaTime);
+
+            if (Vector3.Distance(transform.position, walkTarget) < 0.01f)
             {
-                isUsingTool = false;
-                if (movement == Vector2.zero)
-                    ChangeAnimationState("idle-" + lastDirection);
+                transform.position = walkTarget;
+                isWalkingToTarget = false;
+
+                // Setelah sampe, mulai tool animation
+                Vector3Int delta = walkFinalGrid - walkIntermediateGrid;
+                lastDirection = delta.x > 0 ? "kanan" : "kiri";
+                ChangeAnimationState("nyangkul-kanan");
+                isUsingTool = true;
+                toolFirstFrame = true;
             }
             return;
         }
 
-        // 1. CEK KLIK MOUSE
-        if (Input.GetMouseButtonDown(0))
+        // BLOK GERAK + INPUT selama animasi nyangkul
+        if (isUsingTool)
         {
-            UpdateMouseDirection();
-            if (isUsingTool) return;
+            if (toolFirstFrame)
+            {
+                toolFirstFrame = false;
+                toolTimer = anim.GetCurrentAnimatorStateInfo(0).length;
+            }
+            else
+            {
+                toolTimer -= Time.deltaTime;
+                if (toolTimer <= 0f)
+                {
+                    isUsingTool = false;
+                    toolFirstFrame = true;
+                    if (movement == Vector2.zero)
+                        ChangeAnimationState("idle-" + lastDirection);
+                }
+            }
+            return;
         }
 
-        // 2. LOGIKA SAAT BERGERAK (WASD)
+        // 1. KLIK MOUSE
+        if (Input.GetMouseButtonDown(0))
+        {
+            bool inRange = tilemapReadController == null ||
+                           tilemapReadController.IsMouseOverInRangeTile();
+            if (inRange)
+            {
+                bool onPlayerTile = tilemapReadController != null &&
+                                    tilemapReadController.IsMouseOverPlayerTile();
+                if (onPlayerTile)
+                {
+                    lastDirection = "depan";
+                    ChangeAnimationState("nyangkul-depan");
+                    isUsingTool = true;
+                }
+                else if (tilemapReadController != null && tilemapReadController.IsMouseOverDiagonalTile())
+                {
+                    HandleDiagonalClick();
+                }
+                else
+                {
+                    UpdateMouseDirection();
+                }
+                if (isUsingTool || isWalkingToTarget) return;
+            }
+        }
+
+        // 2. WASD
         if (movement != Vector2.zero) 
         {
             if (movement.x < 0) 
@@ -72,7 +131,7 @@ public class PlayerController : MonoBehaviour
                 lastDirection = "depan"; 
             }
         }
-        // 3. LOGIKA SAAT DIAM
+        // 3. DIAM
         else 
         {
             if (lastDirection == "kiri") ChangeAnimationState("idle-kiri");
@@ -84,45 +143,94 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (isUsingTool || isWalkingToTarget) return;
         rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
+    }
+
+    void HandleDiagonalClick()
+    {
+        Vector3Int gridPos = tilemapReadController.GetMouseGridPosition();
+        Vector3Int playerGrid = tilemapReadController.GetPlayerGridPosition();
+        Vector3Int delta = gridPos - playerGrid;
+
+        Vector3Int intermediateGrid = playerGrid;
+        intermediateGrid.y += delta.y > 0 ? 1 : -1;
+
+        walkTarget = tilemapReadController.GridToWorldFeet(intermediateGrid);
+        walkTarget.z = 0;
+        walkIntermediateGrid = intermediateGrid;
+        walkFinalGrid = gridPos;
+        isWalkingToTarget = true;
+
+        // Mulai jalan
+        lastDirection = delta.y > 0 ? "belakang" : "depan";
+        ChangeAnimationState(delta.y > 0 ? "jalan-atas" : "jalan-bawah");
     }
 
     void UpdateMouseDirection()
     {
-        Vector3 mousePosition = mainCam.ScreenToWorldPoint(Input.mousePosition);
-        Vector2 aimDirection = mousePosition - transform.position;
-        float dist = aimDirection.magnitude;
-        if (dist > 3f) return;
+        string animName;
 
-        if (Mathf.Abs(aimDirection.x) > Mathf.Abs(aimDirection.y))
+        if (tilemapReadController != null)
         {
-            if (aimDirection.x > 0)
+            Vector3Int gridPos = tilemapReadController.GetMouseGridPosition();
+            Vector3Int playerGrid = tilemapReadController.GetPlayerGridPosition();
+            Vector3Int delta = gridPos - playerGrid;
+
+            if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
             {
-                lastDirection = "kanan";
-                ChangeAnimationState("nyangkul-kanan");
-                isUsingTool = true;
-                toolTimer = 0.35f;
-                return;
+                lastDirection = delta.x > 0 ? "kanan" : "kiri";
+                animName = "nyangkul-kanan";
             }
-            else lastDirection = "kiri";
+            else if (delta.y > 0)
+            {
+                lastDirection = "belakang";
+                animName = "nyangkul-kanan";
+            }
+            else
+            {
+                lastDirection = "depan";
+                animName = "nyangkul-depan";
+            }
         }
         else
         {
-            if (aimDirection.y > 0) lastDirection = "belakang";
-            else lastDirection = "depan";
+            Vector3 mousePos = mainCam.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 aimDir = mousePos - transform.position;
+            if (aimDir.magnitude > 3f) return;
+
+            if (Mathf.Abs(aimDir.x) > Mathf.Abs(aimDir.y))
+            {
+                lastDirection = aimDir.x > 0 ? "kanan" : "kiri";
+                animName = "nyangkul-kanan";
+            }
+            else if (aimDir.y > 0)
+            {
+                lastDirection = "belakang";
+                animName = "nyangkul-kanan";
+            }
+            else
+            {
+                lastDirection = "depan";
+                animName = "nyangkul-depan";
+            }
         }
-        
-        if (movement == Vector2.zero)
-        {
-            ChangeAnimationState("idle-" + lastDirection);
-        }
+
+        ChangeAnimationState(animName);
+        isUsingTool = true;
     }
 
     void ChangeAnimationState(string newAnimation)
     {
-        if (currentAnimation == newAnimation) return;
+        if (currentAnimation == newAnimation && !newAnimation.StartsWith("nyangkul-")) return;
 
         anim.Play(newAnimation);
         currentAnimation = newAnimation;
+
+        if (spriteRenderer != null)
+        {
+            bool isNyangkul = currentAnimation.StartsWith("nyangkul-");
+            spriteRenderer.flipX = isNyangkul && lastDirection == "kiri";
+        }
     }
 }

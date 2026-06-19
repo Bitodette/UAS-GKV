@@ -247,7 +247,6 @@ RectTransform:
   - {fileID: 1737513203}
   - {fileID: 1435399423}
   - {fileID: 1103059223}
-  - {fileID: 791151056}
   - {fileID: 167579482}
   - {fileID: 1047152499}
   - {fileID: 500536657}
@@ -258,6 +257,7 @@ RectTransform:
   - {fileID: 618554308}
   - {fileID: 215762895}
   - {fileID: 470544209}
+  - {fileID: 2100160511}
   m_Father: {fileID: 1696242018}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2636,6 +2636,8 @@ MonoBehaviour:
   tilemap: {fileID: 1186464416}
   tileDatas: []
   useRange: 1
+  playerCenterOffset: 0.75
+  cropsManager: {fileID: 0}
 --- !u!1 &850390112
 GameObject:
   m_ObjectHideFlags: 0
@@ -3312,6 +3314,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 18e665539a4abd84c9db90fee11b4688, type: 2}
   - {fileID: 11400000, guid: 91793fe19b86f8846ad6867913f88e5b, type: 2}
   useRange: 1
+  playerCenterOffset: 0.75
+  cropsManager: {fileID: 0}
 --- !u!1 &1001033810
 GameObject:
   m_ObjectHideFlags: 0
@@ -29337,7 +29341,7 @@ Transform:
   m_GameObject: {fileID: 2041105306}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.02, y: -1.25, z: -0.01}
+  m_LocalPosition: {x: 0.39, y: -1.16, z: -0.01}
   m_LocalScale: {x: 3.6458, y: 3.6458, z: 3.6458}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -29399,9 +29403,6 @@ MonoBehaviour:
   offsetDistance: 1
   sizeOfInteractableArea: 1.2
   maxUseDistance: 3
-  tilemapReadController: {fileID: 982339093}
-  cropsManager: {fileID: 889043680}
-  plowableTiles: {fileID: 11400000, guid: 91793fe19b86f8846ad6867913f88e5b, type: 2}
 --- !u!61 &2041105315
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -29437,8 +29438,6 @@ BoxCollider2D:
   m_Offset: {x: 0, y: 0.16974664}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.49999997, y: -0.18181819}
-    oldSize: {x: 0.25, y: 0.44}
     pivot: {x: 0.49999997, y: -0.18181819}
     oldSize: {x: 0.25, y: 0.44}
     newSize: {x: 0.25, y: 0.39}
@@ -29544,6 +29543,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2069734173}
   m_CullTransparentMesh: 1
+--- !u!224 &2100160511 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 1369126130158245794, guid: 34d7972839adbdb4ba805ffae86f589b, type: 3}
+  m_PrefabInstance: {fileID: 1247158152}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2133176341
 PrefabInstance:
   m_ObjectHideFlags: 0

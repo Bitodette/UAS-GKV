@@ -183,9 +183,6 @@ public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointe
             inventory.RefreshUI();
         }
 
-        sourceSlot.parentAfterDrag = transform;
-        sourceSlot.iconTransform.SetParent(transform);
-        sourceSlot.iconTransform.localPosition = Vector3.zero;
     }
 
     public void UpdateSlot(ItemData item, int count)

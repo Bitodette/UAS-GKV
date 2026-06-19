@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -8,6 +9,9 @@ public class TilemapReadController : MonoBehaviour
     [SerializeField] private Tilemap tilemap;
     [SerializeField] private List<TileData> tileDatas;
     [SerializeField] private int useRange = 1;
+    [SerializeField] private float playerCenterOffset = 0.75f;
+
+    [SerializeField] private CropsManager cropsManager;
 
     private Dictionary<TileBase, TileData> dataFromTiles;
     private SpriteRenderer highlightSprite;
@@ -20,6 +24,9 @@ public class TilemapReadController : MonoBehaviour
 
         if (tilemap == null)
             tilemap = FindFirstObjectByType<Tilemap>();
+
+        if (cropsManager == null)
+            cropsManager = FindFirstObjectByType<CropsManager>();
 
         foreach (TileData tileData in tileDatas)
         {
@@ -61,27 +68,39 @@ public class TilemapReadController : MonoBehaviour
 
     private void Update()
     {
-        UpdateHighlight();
-
-        if (IsPointerOverUI()) return;
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            TryUseTile(Input.mousePosition);
-        }
-    }
-
-    private void UpdateHighlight()
-    {
         if (tilemap == null) return;
+
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         worldPos.z = 0;
         Vector3Int gridPos = tilemap.WorldToCell(worldPos);
-        Vector3Int playerGrid = tilemap.WorldToCell(GetPlayerPosition());
+
+        Vector3Int playerGrid = GetPlayerGridPosition();
         int dx = Mathf.Abs(gridPos.x - playerGrid.x);
         int dy = Mathf.Abs(gridPos.y - playerGrid.y);
         bool inRange = dx <= useRange && dy <= useRange && tilemap.GetTile(gridPos) != null;
 
+        // KLIK — PAKAI inRange YANG SAMA PERSIS DENGAN HIGHLIGHT
+        if (!IsPointerOverUI() && Input.GetMouseButtonDown(0))
+        {
+            Debug.Log($"Klik grid=({gridPos.x},{gridPos.y}) playerGrid=({playerGrid.x},{playerGrid.y}) dx={dx} dy={dy} range={useRange} adaTile={tilemap.GetTile(gridPos) != null} inRange={inRange}");
+
+            if (inRange && cropsManager != null)
+            {
+                TileData tileData = GetTileData(tilemap.GetTile(gridPos));
+                bool isSeeded = cropsManager.Check(gridPos);
+                Debug.Log($"→ AKAN di-{(isSeeded ? "SEED" : "PLOW")} di ({gridPos.x},{gridPos.y})");
+                if (isSeeded)
+                    cropsManager.Seed(gridPos);
+                else if (tileData != null && tileData.plowable)
+                    cropsManager.Plow(gridPos);
+            }
+            else
+            {
+                Debug.Log($"→ TIDAK action. inRange={inRange} cropsManager={cropsManager != null}");
+            }
+        }
+
+        // HIGHLIGHT
         if (isHighlighted && gridPos == lastHighlightPos && inRange) return;
 
         if (isHighlighted)
@@ -100,24 +119,6 @@ public class TilemapReadController : MonoBehaviour
         }
     }
 
-    private void TryUseTile(Vector2 mousePosition)
-    {
-        Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
-        worldPosition.z = 0;
-
-        Vector3Int gridPosition = tilemap.WorldToCell(worldPosition);
-        TileBase tileBase = tilemap.GetTile(gridPosition);
-
-        if (tileBase == null) return;
-
-        Vector3Int playerGridPos = tilemap.WorldToCell(GetPlayerPosition());
-        int dx = Mathf.Abs(gridPosition.x - playerGridPos.x);
-        int dy = Mathf.Abs(gridPosition.y - playerGridPos.y);
-        if (dx > useRange || dy > useRange) return;
-
-        Debug.Log("Tile in position = " + gridPosition + " is " + tileBase);
-    }
-
     private bool IsPointerOverUI()
     {
         return EventSystem.current != null &&
@@ -127,42 +128,66 @@ public class TilemapReadController : MonoBehaviour
     private Vector2 GetPlayerPosition()
     {
         if (GameManager.Instance != null && GameManager.Instance.player != null)
-            return GameManager.Instance.player.transform.position;
+            return (Vector2)GameManager.Instance.player.transform.position + Vector2.up * playerCenterOffset;
 
         return Vector2.zero;
     }
 
-    public Vector3Int GetGridPosition(Vector2 position, bool mousePosition = false)
+    public Vector3Int GetPlayerGridPosition()
     {
-        Vector3 worldPosition = mousePosition
-            ? Camera.main.ScreenToWorldPoint(position)
-            : (Vector3)position;
-
-        return tilemap.WorldToCell(worldPosition);
-    }
-
-    public TileBase GetTileBase(Vector3Int gridPosition)
-    {
-        TileBase tileBase = tilemap.GetTile(gridPosition);
-
-        Debug.Log("Tile in position = " + gridPosition + " is " + tileBase);
-        return tileBase;
-    }
-
-    public TileBase GetTileBase(Vector2 mousePosition)
-    {
-        Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
-        worldPosition.z = 0;
-
-        Vector3Int gridPosition = tilemap.WorldToCell(worldPosition);
-        return tilemap.GetTile(gridPosition);
+        if (tilemap == null) return Vector3Int.zero;
+        return tilemap.WorldToCell(GetPlayerPosition());
     }
 
     public TileData GetTileData(TileBase tileBase)
     {
         if (tileBase == null) return null;
-
         dataFromTiles.TryGetValue(tileBase, out TileData data);
         return data;
+    }
+
+    public bool IsMouseOverInRangeTile()
+    {
+        if (tilemap == null) return false;
+        Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        worldPos.z = 0;
+        Vector3Int gridPos = tilemap.WorldToCell(worldPos);
+        Vector3Int playerGrid = GetPlayerGridPosition();
+        int dx = Mathf.Abs(gridPos.x - playerGrid.x);
+        int dy = Mathf.Abs(gridPos.y - playerGrid.y);
+        return dx <= useRange && dy <= useRange && tilemap.GetTile(gridPos) != null;
+    }
+
+    public bool IsMouseOverPlayerTile()
+    {
+        if (tilemap == null) return false;
+        Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        worldPos.z = 0;
+        Vector3Int gridPos = tilemap.WorldToCell(worldPos);
+        return gridPos == GetPlayerGridPosition();
+    }
+
+    public Vector3Int GetMouseGridPosition()
+    {
+        if (tilemap == null) return Vector3Int.zero;
+        Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        worldPos.z = 0;
+        return tilemap.WorldToCell(worldPos);
+    }
+
+    public bool IsMouseOverDiagonalTile()
+    {
+        if (tilemap == null) return false;
+        Vector3Int gridPos = GetMouseGridPosition();
+        Vector3Int playerGrid = GetPlayerGridPosition();
+        Vector3Int d = gridPos - playerGrid;
+        return d.x != 0 && d.y != 0 && Mathf.Abs(d.x) <= useRange && Mathf.Abs(d.y) <= useRange && tilemap.GetTile(gridPos) != null;
+    }
+
+    public Vector3 GridToWorldFeet(Vector3Int gridPos)
+    {
+        Vector3 center = tilemap.GetCellCenterWorld(gridPos);
+        center.y -= playerCenterOffset;
+        return center;
     }
 }

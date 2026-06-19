@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Tilemaps;
 public class ToolsCharacterController : MonoBehaviour
 {
     Rigidbody2D rb;
@@ -7,65 +6,24 @@ public class ToolsCharacterController : MonoBehaviour
     [SerializeField] float offsetDistance = 1f;
     [SerializeField] float sizeOfInteractableArea = 1.2f;
     [SerializeField] float maxUseDistance = 1.5f;
-    [SerializeField] TilemapReadController tilemapReadController;
-
-    [SerializeField] CropsManager cropsManager;
-    [SerializeField] TileData plowableTiles;
 
     Camera mainCam;
-
-    private bool selectable;
-    private Vector3Int selectedTilePosition;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         mainCam = Camera.main;
-
-        if (tilemapReadController == null)
-            tilemapReadController = FindFirstObjectByType<TilemapReadController>();
-        if (cropsManager == null)
-            cropsManager = FindFirstObjectByType<CropsManager>();
     }
 
     void Update()
     {
-        SelectTile();
-        CanSelectCheck();
-
         if (Input.GetMouseButtonDown(0))
         {
-            if (!UseToolWorld())
-            {
-                UseToolGrid();
-            }
+            UseToolWorld();
         }
     }
 
-    private void SelectTile()
-    {
-        if (tilemapReadController == null) return;
-        selectedTilePosition =
-            tilemapReadController.GetGridPosition(
-                Input.mousePosition,
-                true
-            );
-    }
-
-    private void CanSelectCheck()
-    {
-        Vector2 characterPosition = transform.position;
-        Vector2 mousePosition =
-            mainCam.ScreenToWorldPoint(Input.mousePosition);
-
-        selectable =
-            Vector2.Distance(
-                characterPosition,
-                mousePosition
-            ) <= maxUseDistance;
-    }
-
-    private bool UseToolWorld()
+    private void UseToolWorld()
     {
         Vector3 mousePosition =
             mainCam.ScreenToWorldPoint(Input.mousePosition);
@@ -76,7 +34,7 @@ public class ToolsCharacterController : MonoBehaviour
             Vector2.Distance(mousePosition, transform.position);
 
         if (dist > maxUseDistance)
-            return false;
+            return;
 
         HotbarManager hotbar =
             FindFirstObjectByType<HotbarManager>();
@@ -116,27 +74,7 @@ public class ToolsCharacterController : MonoBehaviour
             if (hit != null)
             {
                 hit.Hit();
-                return true;
             }
-        }
-
-        return false;
-    }
-
-    private void UseToolGrid()
-    {
-        if (!selectable || tilemapReadController == null || cropsManager == null) return;
-
-        TileBase tileBase = tilemapReadController.GetTileBase(selectedTilePosition);
-        TileData tileData = tilemapReadController.GetTileData(tileBase);
-
-        if (cropsManager.Check(selectedTilePosition))
-        {
-            cropsManager.Seed(selectedTilePosition);
-        }
-        else if (tileData != null && tileData.plowable)
-        {
-            cropsManager.Plow(selectedTilePosition);
         }
     }
 }
