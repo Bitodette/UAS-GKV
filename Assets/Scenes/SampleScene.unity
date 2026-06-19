@@ -2755,11 +2755,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tilemap: {fileID: 1186464416}
+  highlightTilemap: {fileID: 0}
+  groundTilemap: {fileID: 0}
   tileDatas: []
   plowableData: {fileID: 11400000, guid: 91793fe19b86f8846ad6867913f88e5b, type: 2}
   nonPlowableData: {fileID: 11400000, guid: 18e665539a4abd84c9db90fee11b4688, type: 2}
   useRange: 1
-  playerCenterOffset: 0.5
+  playerCenterOffset: 0.75
   cropsManager: {fileID: 0}
 --- !u!1 &850390112
 GameObject:

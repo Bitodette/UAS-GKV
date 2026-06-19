@@ -56,7 +56,7 @@ public class PlayerController : MonoBehaviour
                 Vector3Int delta = walkFinalGrid - walkIntermediateGrid;
                 if (delta.x > 0) { lastDirection = "kanan"; ChangeAnimationState("nyangkul-kanan"); }
                 else if (delta.x < 0) { lastDirection = "kiri"; ChangeAnimationState("nyangkul-kanan"); }
-                else if (delta.y > 0) { lastDirection = "belakang"; ChangeAnimationState("nyangkul-depan"); }
+                else if (delta.y > 0) { lastDirection = "belakang"; ChangeAnimationState("nyangkul-belakang"); }
                 else { lastDirection = "depan"; ChangeAnimationState("nyangkul-depan"); }
                 isUsingTool = true;
                 toolFirstFrame = true;
