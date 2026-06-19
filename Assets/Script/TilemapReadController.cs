@@ -7,6 +7,8 @@ using UnityEngine.EventSystems;
 public class TilemapReadController : MonoBehaviour
 {
     [SerializeField] private Tilemap tilemap;
+    [SerializeField] private Tilemap highlightTilemap;
+    [SerializeField] private Tilemap groundTilemap;
     [SerializeField] private List<TileData> tileDatas;
     [SerializeField] private int useRange = 1;
     [SerializeField] private float playerCenterOffset = 0.75f;
@@ -72,8 +74,8 @@ public class TilemapReadController : MonoBehaviour
     private void Update()
     {
         if (tilemap == null) return;
+        Tilemap hlMap = highlightTilemap != null ? highlightTilemap : tilemap;
 
-        // Cek apakah tools/cangkul yang di-select
         bool toolSelected = hotbar != null && hotbar.SelectedItem != null && hotbar.SelectedItem.itemName == "tools";
         if (!toolSelected)
         {
@@ -92,16 +94,17 @@ public class TilemapReadController : MonoBehaviour
         Vector3Int playerGrid = GetPlayerGridPosition();
         int dx = Mathf.Abs(gridPos.x - playerGrid.x);
         int dy = Mathf.Abs(gridPos.y - playerGrid.y);
-        bool inRange = dx <= useRange && dy <= useRange && tilemap.GetTile(gridPos) != null;
+        bool inRange = dx <= useRange && dy <= useRange && hlMap.GetTile(gridPos) != null;
 
-        // KLIK — PAKAI inRange YANG SAMA PERSIS DENGAN HIGHLIGHT
         if (!IsPointerOverUI() && Input.GetMouseButtonDown(0))
         {
-            Debug.Log($"Klik grid=({gridPos.x},{gridPos.y}) playerGrid=({playerGrid.x},{playerGrid.y}) dx={dx} dy={dy} range={useRange} adaTile={tilemap.GetTile(gridPos) != null} inRange={inRange}");
+            Debug.Log($"Klik grid=({gridPos.x},{gridPos.y}) playerGrid=({playerGrid.x},{playerGrid.y}) dx={dx} dy={dy} range={useRange} adaTile={hlMap.GetTile(gridPos) != null} inRange={inRange}");
 
             if (inRange && cropsManager != null)
             {
-                TileData tileData = GetTileData(tilemap.GetTile(gridPos));
+                Tilemap readMap = groundTilemap != null ? groundTilemap : tilemap;
+                TileBase tileBase = readMap.GetTile(gridPos);
+                TileData tileData = GetTileData(tileBase);
                 bool isSeeded = cropsManager.Check(gridPos);
                 Debug.Log($"→ AKAN di-{(isSeeded ? "SEED" : "PLOW")} di ({gridPos.x},{gridPos.y})");
                 if (isSeeded)
@@ -115,7 +118,6 @@ public class TilemapReadController : MonoBehaviour
             }
         }
 
-        // HIGHLIGHT
         if (isHighlighted && gridPos == lastHighlightPos && inRange) return;
 
         if (isHighlighted)
@@ -126,7 +128,7 @@ public class TilemapReadController : MonoBehaviour
 
         if (inRange)
         {
-            Vector3 tileCenter = tilemap.GetCellCenterWorld(gridPos);
+            Vector3 tileCenter = hlMap.GetCellCenterWorld(gridPos);
             highlightSprite.transform.position = tileCenter;
             highlightSprite.gameObject.SetActive(true);
             lastHighlightPos = gridPos;
