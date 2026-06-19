@@ -38,10 +38,20 @@ public class PickupItem : MonoBehaviour
         if (distance < 0.1f)
         {
             Debug.Log("[PickupItem] Picked up! itemData=" + (itemData != null ? itemData.itemName : "NULL"));
-            HotbarManager hotbar = FindFirstObjectByType<HotbarManager>();
-            Debug.Log("[PickupItem] HotbarManager found=" + (hotbar != null));
-            if (hotbar != null && itemData != null)
-                hotbar.AddItem(itemData);
+            if (itemData != null)
+            {
+                HotbarManager hotbar = FindFirstObjectByType<HotbarManager>();
+                bool added = false;
+                if (hotbar != null)
+                    added = hotbar.AddItem(itemData);
+
+                if (!added)
+                {
+                    InventoryManager inventory = FindFirstObjectByType<InventoryManager>();
+                    if (inventory != null)
+                        inventory.AddItem(itemData);
+                }
+            }
             Destroy(gameObject);
         }
     }
