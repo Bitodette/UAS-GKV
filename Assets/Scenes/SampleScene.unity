@@ -29169,7 +29169,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 4
-  m_Sprite: {fileID: -8228753040126257311, guid: fec25fe3033726844b2a7e54a13df018, type: 3}
+  m_Sprite: {fileID: 8941500473190642703, guid: fec25fe3033726844b2a7e54a13df018, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -29251,6 +29251,9 @@ MonoBehaviour:
   offsetDistance: 1
   sizeOfInteractableArea: 1.2
   maxUseDistance: 3
+  tilemapReadController: {fileID: 0}
+  cropsManager: {fileID: 0}
+  plowableTiles: {fileID: 0}
 --- !u!61 &2041105315
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -29286,8 +29289,8 @@ BoxCollider2D:
   m_Offset: {x: 0, y: 0.16974664}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.49999997, y: -0.33333334}
-    oldSize: {x: 0.25, y: 0.39}
+    pivot: {x: 0.49999997, y: -0.18181819}
+    oldSize: {x: 0.25, y: 0.44}
     newSize: {x: 0.25, y: 0.39}
     adaptiveTilingThreshold: 0.5
     drawMode: 0

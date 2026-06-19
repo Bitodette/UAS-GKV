@@ -3,7 +3,8 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 
-public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointerEnterHandler, IPointerExitHandler
+public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointerEnterHandler, IPointerExitHandler,
+    IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [SerializeField] private Image iconImage;
     [SerializeField] private TMP_Text countText;
@@ -17,6 +18,10 @@ public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointe
     private int slotIndex;
     private bool isInventorySlot;
 
+    private CanvasGroup canvasGroup;
+    private Transform iconTransform;
+    private Transform parentAfterDrag;
+
     void Awake()
     {
         slotImage = GetComponent<Image>();
@@ -28,6 +33,16 @@ public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointe
 
         if (hoverOverlay != null)
             hoverOverlay.SetActive(false);
+
+        canvasGroup = GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+            canvasGroup = gameObject.AddComponent<CanvasGroup>();
+
+        if (iconImage != null)
+        {
+            iconTransform = iconImage.transform;
+            iconImage.raycastTarget = false;
+        }
     }
 
     public void SetSlotIndex(int index)
@@ -71,12 +86,47 @@ public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointe
             hoverOverlay.SetActive(false);
     }
 
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        if (iconImage == null || iconImage.sprite == null) return;
+
+        if (isInventorySlot)
+        {
+            InventoryManager inventory = FindFirstObjectByType<InventoryManager>();
+            if (inventory == null || inventory.InventoryPanel == null || !inventory.InventoryPanel.activeSelf)
+            {
+                eventData.pointerDrag = null;
+                return;
+            }
+        }
+
+        parentAfterDrag = transform;
+
+        iconTransform.SetParent(transform.root);
+        iconTransform.SetAsLastSibling();
+
+        canvasGroup.blocksRaycasts = false;
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (iconImage == null || iconImage.sprite == null) return;
+        iconTransform.position = Input.mousePosition;
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        if (iconImage == null) return;
+
+        iconTransform.SetParent(parentAfterDrag);
+        iconTransform.localPosition = Vector3.zero;
+
+        canvasGroup.blocksRaycasts = true;
+    }
+
     public void OnDrop(PointerEventData eventData)
     {
-        DraggableItem draggedItem = eventData.pointerDrag.GetComponent<DraggableItem>();
-        if (draggedItem == null) return;
-
-        SlotUI sourceSlot = draggedItem.parentAfterDrag.GetComponent<SlotUI>();
+        SlotUI sourceSlot = eventData.pointerDrag.GetComponent<SlotUI>();
         if (sourceSlot == null) return;
 
         HotbarManager hotbar = FindFirstObjectByType<HotbarManager>();
@@ -106,8 +156,7 @@ public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointe
             int targetCount = inventory.ItemCounts[toIndex];
 
             hotbar.SetItem(fromIndex, targetItem, targetCount);
-            inventory.InventoryItems[toIndex] = sourceItem;
-            inventory.ItemCounts[toIndex] = sourceCount;
+            inventory.SetItem(toIndex, sourceItem, sourceCount);
 
             hotbar.RefreshUI();
             inventory.RefreshUI();
@@ -119,17 +168,16 @@ public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointe
             ItemData targetItem = hotbar.GetItem(toIndex);
             int targetCount = hotbar.GetItemCount(toIndex);
 
-            inventory.InventoryItems[fromIndex] = targetItem;
-            inventory.ItemCounts[fromIndex] = targetCount;
+            inventory.SetItem(fromIndex, targetItem, targetCount);
             hotbar.SetItem(toIndex, sourceItem, sourceCount);
 
             hotbar.RefreshUI();
             inventory.RefreshUI();
         }
 
-        draggedItem.parentAfterDrag = transform;
-        draggedItem.transform.SetParent(transform);
-        draggedItem.transform.localPosition = Vector3.zero;
+        sourceSlot.parentAfterDrag = transform;
+        sourceSlot.iconTransform.SetParent(transform);
+        sourceSlot.iconTransform.localPosition = Vector3.zero;
     }
 
     public void UpdateSlot(ItemData item, int count)

@@ -131,6 +131,14 @@ public class InventoryManager : MonoBehaviour
         itemCounts[index] = 0;
     }
 
+    public void SetItem(int index, ItemData item, int count)
+    {
+        if (inventoryItems == null) return;
+        if (index < 0 || index >= inventorySlots.Length) return;
+        inventoryItems[index] = item;
+        itemCounts[index] = count;
+    }
+
     public void RefreshUI()
     {
         if (inventorySlots == null || inventoryItems == null) return;
