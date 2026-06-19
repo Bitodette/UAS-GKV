@@ -1323,6 +1323,9 @@ MonoBehaviour:
   - {fileID: 2069734175}
   slotPrefab: {fileID: 6652222535282735781, guid: 34d7972839adbdb4ba805ffae86f589b, type: 3}
   selectedSlotSprite: {fileID: 3637030607187992235, guid: 39072982c9a85024e9db87a81e3736ee, type: 3}
+  defaultItems:
+  - {fileID: 11400000, guid: e8a3f7c2d1b9450684f07e3c92a5d618, type: 2}
+  - {fileID: 11400000, guid: c86d1f9a882dd744fb2062ca823171d7, type: 2}
   slotWidth: 70
   slotHeight: 70
   spacing: 6
@@ -3557,6 +3560,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 2041105306}
+  hotbar: {fileID: 0}
+  inventory: {fileID: 0}
 --- !u!4 &982339092
 Transform:
   m_ObjectHideFlags: 0
