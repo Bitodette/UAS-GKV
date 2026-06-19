@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 90af6e2b23573a947ad3ba95e38dccd8
+guid: e5e1f68d538e3b04ca450781e42a208e
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -122,18 +122,18 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: Wheat
+  - name: Wheat pack
     originalName: 
-    pivot: {x: 0.57142854, y: -0.87499994}
+    pivot: {x: 0.5, y: -1.076923}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 14
-      height: 16
-    spriteID: fbbb1b0b945ebf24da497e95ea4e3d9a
+      width: 12
+      height: 13
+    spriteID: 3443c09993143c944a20cdf04e737a83
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -146,25 +146,25 @@ ScriptedImporter:
   asepriteLayers:
   - layerIndex: 0
     uuid:
-      value0: 1178358527
+      value0: 634086446
       value1: 0
       value2: 0
       value3: 0
     guid: 0
-    name: Wheat
+    name: Wheat pack
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: Wheat
+    - name: Wheat pack
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
-        x: 16
+        x: 18
         y: 14
-        width: 14
-        height: 16
-      spriteId: fbbb1b0b945ebf24da497e95ea4e3d9a
+        width: 12
+        height: 13
+      spriteId: 3443c09993143c944a20cdf04e737a83
     linkedCells: []
     parentIndex: -1
   platformSettings:

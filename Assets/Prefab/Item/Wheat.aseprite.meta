@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 90af6e2b23573a947ad3ba95e38dccd8
+guid: 91c2ed66178b0614f9e45c583680b552
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -129,9 +129,9 @@ ScriptedImporter:
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
       serializedVersion: 2
-      x: 4
+      x: 6
       y: 4
-      width: 14
+      width: 12
       height: 16
     spriteID: fbbb1b0b945ebf24da497e95ea4e3d9a
     spriteBone: []

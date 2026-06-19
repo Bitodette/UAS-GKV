@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 90af6e2b23573a947ad3ba95e38dccd8
+guid: 57c50b38dc59112499da2fd648423307
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -122,18 +122,18 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: Wheat
+  - name: Cangkul
     originalName: 
-    pivot: {x: 0.57142854, y: -0.87499994}
+    pivot: {x: 0.54545456, y: -0.90909094}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 14
-      height: 16
-    spriteID: fbbb1b0b945ebf24da497e95ea4e3d9a
+      width: 22
+      height: 11
+    spriteID: 94981fdf4bd02344baf60e840db84b64
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -146,25 +146,25 @@ ScriptedImporter:
   asepriteLayers:
   - layerIndex: 0
     uuid:
-      value0: 1178358527
+      value0: 391952491
       value1: 0
       value2: 0
       value3: 0
     guid: 0
-    name: Wheat
+    name: tools
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: Wheat
+    - name: Cangkul
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
-        x: 16
-        y: 14
-        width: 14
-        height: 16
-      spriteId: fbbb1b0b945ebf24da497e95ea4e3d9a
+        x: 4
+        y: 10
+        width: 22
+        height: 11
+      spriteId: 94981fdf4bd02344baf60e840db84b64
     linkedCells: []
     parentIndex: -1
   platformSettings:
@@ -183,5 +183,5 @@ ScriptedImporter:
   generatePhysicsShape: 0
   secondarySpriteTextures: []
   spritePackingTag: 
-  canvasSize: {x: 48, y: 46}
+  canvasSize: {x: 32, y: 32}
   previousTextureSize: {x: 32, y: 32}
