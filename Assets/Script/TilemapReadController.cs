@@ -17,6 +17,7 @@ public class TilemapReadController : MonoBehaviour
     private SpriteRenderer highlightSprite;
     private Vector3Int lastHighlightPos;
     private bool isHighlighted = false;
+    private HotbarManager hotbar;
 
     private void Start()
     {
@@ -27,6 +28,8 @@ public class TilemapReadController : MonoBehaviour
 
         if (cropsManager == null)
             cropsManager = FindFirstObjectByType<CropsManager>();
+
+        hotbar = FindFirstObjectByType<HotbarManager>();
 
         foreach (TileData tileData in tileDatas)
         {
@@ -69,6 +72,18 @@ public class TilemapReadController : MonoBehaviour
     private void Update()
     {
         if (tilemap == null) return;
+
+        // Cek apakah tools/cangkul yang di-select
+        bool toolSelected = hotbar != null && hotbar.SelectedItem != null && hotbar.SelectedItem.itemName == "tools";
+        if (!toolSelected)
+        {
+            if (isHighlighted)
+            {
+                highlightSprite.gameObject.SetActive(false);
+                isHighlighted = false;
+            }
+            return;
+        }
 
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         worldPos.z = 0;
@@ -148,7 +163,7 @@ public class TilemapReadController : MonoBehaviour
 
     public bool IsMouseOverInRangeTile()
     {
-        if (tilemap == null) return false;
+        if (tilemap == null || !IsToolSelected()) return false;
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         worldPos.z = 0;
         Vector3Int gridPos = tilemap.WorldToCell(worldPos);
@@ -160,7 +175,7 @@ public class TilemapReadController : MonoBehaviour
 
     public bool IsMouseOverPlayerTile()
     {
-        if (tilemap == null) return false;
+        if (tilemap == null || !IsToolSelected()) return false;
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         worldPos.z = 0;
         Vector3Int gridPos = tilemap.WorldToCell(worldPos);
@@ -177,7 +192,7 @@ public class TilemapReadController : MonoBehaviour
 
     public bool IsMouseOverDiagonalTile()
     {
-        if (tilemap == null) return false;
+        if (tilemap == null || !IsToolSelected()) return false;
         Vector3Int gridPos = GetMouseGridPosition();
         Vector3Int playerGrid = GetPlayerGridPosition();
         Vector3Int d = gridPos - playerGrid;
@@ -189,5 +204,10 @@ public class TilemapReadController : MonoBehaviour
         Vector3 center = tilemap.GetCellCenterWorld(gridPos);
         center.y -= playerCenterOffset;
         return center;
+    }
+
+    public bool IsToolSelected()
+    {
+        return hotbar != null && hotbar.SelectedItem != null && hotbar.SelectedItem.itemName == "tools";
     }
 }

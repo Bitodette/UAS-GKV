@@ -104,6 +104,15 @@ public class HotbarManager : MonoBehaviour
 
         UpdateHighlightVisual();
         RefreshUI();
+
+        // Default items kalo hotbar kosong
+        ItemData tools = Resources.Load<ItemData>("Items/tools");
+        if (tools != null && inventoryItems[0] == null)
+        {
+            inventoryItems[0] = tools;
+            itemCounts[0] = 1;
+            RefreshUI();
+        }
     }
 
     void Update()
