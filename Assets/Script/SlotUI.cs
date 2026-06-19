@@ -21,6 +21,7 @@ public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointe
     private CanvasGroup canvasGroup;
     private Transform iconTransform;
     private Transform parentAfterDrag;
+    private bool countWasActive;
 
     void Awake()
     {
@@ -105,6 +106,10 @@ public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointe
         iconTransform.SetParent(transform.root);
         iconTransform.SetAsLastSibling();
 
+        countWasActive = countText != null && countText.gameObject.activeSelf;
+        if (countText != null)
+            countText.gameObject.SetActive(false);
+
         canvasGroup.blocksRaycasts = false;
     }
 
@@ -120,6 +125,9 @@ public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointe
 
         iconTransform.SetParent(parentAfterDrag);
         iconTransform.localPosition = Vector3.zero;
+
+        if (countText != null && countWasActive)
+            countText.gameObject.SetActive(true);
 
         canvasGroup.blocksRaycasts = true;
     }
