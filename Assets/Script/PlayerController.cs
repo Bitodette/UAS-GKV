@@ -48,10 +48,12 @@ public class PlayerController : MonoBehaviour
                 transform.position = walkTarget;
                 isWalkingToTarget = false;
 
-                // Setelah sampe, mulai tool animation
+                // Setelah sampe, mulai tool animation sesuai arah
                 Vector3Int delta = walkFinalGrid - walkIntermediateGrid;
-                lastDirection = delta.x > 0 ? "kanan" : "kiri";
-                ChangeAnimationState("nyangkul-kanan");
+                if (delta.x > 0) { lastDirection = "kanan"; ChangeAnimationState("nyangkul-kanan"); }
+                else if (delta.x < 0) { lastDirection = "kiri"; ChangeAnimationState("nyangkul-kanan"); }
+                else if (delta.y > 0) { lastDirection = "belakang"; ChangeAnimationState("nyangkul-depan"); }
+                else { lastDirection = "depan"; ChangeAnimationState("nyangkul-depan"); }
                 isUsingTool = true;
                 toolFirstFrame = true;
             }
@@ -85,22 +87,37 @@ public class PlayerController : MonoBehaviour
         {
             bool inRange = tilemapReadController == null ||
                            tilemapReadController.IsMouseOverInRangeTile();
-            if (inRange)
+            if (inRange && tilemapReadController != null)
             {
-                bool onPlayerTile = tilemapReadController != null &&
-                                    tilemapReadController.IsMouseOverPlayerTile();
-                if (onPlayerTile)
+                Vector3Int gridPos = tilemapReadController.GetMouseGridPosition();
+                Vector3Int playerGrid = tilemapReadController.GetPlayerGridPosition();
+                Vector3Int delta = gridPos - playerGrid;
+
+                if (gridPos == playerGrid)
                 {
                     lastDirection = "depan";
                     ChangeAnimationState("nyangkul-depan");
                     isUsingTool = true;
                 }
-                else if (tilemapReadController != null && tilemapReadController.IsMouseOverDiagonalTile())
+                else if (delta.x != 0 && delta.y != 0)
                 {
                     HandleDiagonalClick();
                 }
+                else if (delta.y != 0)
+                {
+                    // Atas/bawah — jalan ke tile dulu, baru tool
+                    walkIntermediateGrid = playerGrid;
+                    walkFinalGrid = gridPos;
+                    walkTarget = tilemapReadController.GridToWorldFeet(gridPos);
+                    walkTarget.z = 0;
+                    isWalkingToTarget = true;
+
+                    if (delta.y > 0) { lastDirection = "belakang"; ChangeAnimationState("jalan-atas"); }
+                    else { lastDirection = "depan"; ChangeAnimationState("jalan-bawah"); }
+                }
                 else
                 {
+                    // Kiri/kanan — langsung di tempat
                     UpdateMouseDirection();
                 }
                 if (isUsingTool || isWalkingToTarget) return;

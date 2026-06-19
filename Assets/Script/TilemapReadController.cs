@@ -8,6 +8,8 @@ public class TilemapReadController : MonoBehaviour
 {
     [SerializeField] private Tilemap tilemap;
     [SerializeField] private List<TileData> tileDatas;
+    [SerializeField] private TileData plowableData;
+    [SerializeField] private TileData nonPlowableData;
     [SerializeField] private int useRange = 1;
     [SerializeField] private float playerCenterOffset = 0.75f;
 
@@ -24,7 +26,19 @@ public class TilemapReadController : MonoBehaviour
         dataFromTiles = new Dictionary<TileBase, TileData>();
 
         if (tilemap == null)
-            tilemap = FindFirstObjectByType<Tilemap>();
+        {
+            Tilemap[] all = FindObjectsOfType<Tilemap>();
+            foreach (Tilemap t in all)
+            {
+                if (t.name.Contains("Base"))
+                {
+                    tilemap = t;
+                    break;
+                }
+            }
+            if (tilemap == null && all.Length > 0)
+                tilemap = all[0];
+        }
 
         if (cropsManager == null)
             cropsManager = FindFirstObjectByType<CropsManager>();
@@ -38,6 +52,20 @@ public class TilemapReadController : MonoBehaviour
                 if (!dataFromTiles.ContainsKey(tile))
                     dataFromTiles.Add(tile, tileData);
             }
+        }
+
+        if (plowableData != null)
+        {
+            foreach (TileBase tile in plowableData.tiles)
+                if (!dataFromTiles.ContainsKey(tile))
+                    dataFromTiles.Add(tile, plowableData);
+        }
+
+        if (nonPlowableData != null)
+        {
+            foreach (TileBase tile in nonPlowableData.tiles)
+                if (!dataFromTiles.ContainsKey(tile))
+                    dataFromTiles.Add(tile, nonPlowableData);
         }
 
         GameObject hlObj = new GameObject("TileHighlight");
@@ -102,11 +130,9 @@ public class TilemapReadController : MonoBehaviour
             if (inRange && cropsManager != null)
             {
                 TileData tileData = GetTileData(tilemap.GetTile(gridPos));
-                bool isSeeded = cropsManager.Check(gridPos);
-                Debug.Log($"→ AKAN di-{(isSeeded ? "SEED" : "PLOW")} di ({gridPos.x},{gridPos.y})");
-                if (isSeeded)
-                    cropsManager.Seed(gridPos);
-                else if (tileData != null && tileData.plowable)
+                bool alreadyPlowed = cropsManager.Check(gridPos);
+                Debug.Log($"→ Klik: alreadyPlowed={alreadyPlowed} tileData={tileData != null} plowable={(tileData == null || tileData.plowable)}");
+                if (!alreadyPlowed && (tileData == null || tileData.plowable))
                     cropsManager.Plow(gridPos);
             }
             else

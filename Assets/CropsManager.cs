@@ -9,14 +9,31 @@ public class Crops
 public class CropsManager : MonoBehaviour
 {
     [SerializeField] private TileBase plowed;
+    [SerializeField] private Sprite plowedSprite;
     [SerializeField] private TileBase seeded;
     [SerializeField] private Tilemap targetTilemap;
 
     private Dictionary<Vector3Int, Crops> crops;
+    private TileBase plowedTile;
 
     private void Start()
     {
         crops = new Dictionary<Vector3Int, Crops>();
+
+        if (plowed != null)
+            plowedTile = plowed;
+        else if (plowedSprite != null)
+            plowedTile = CreateTileFromSprite(plowedSprite);
+    }
+
+    private TileBase CreateTileFromSprite(Sprite sprite)
+    {
+        Tile tile = ScriptableObject.CreateInstance<Tile>();
+        tile.sprite = sprite;
+        tile.color = Color.white;
+        tile.transform = Matrix4x4.identity;
+        tile.flags = TileFlags.None;
+        return tile;
     }
 
     public bool Check(Vector3Int position)
@@ -45,6 +62,8 @@ public class CropsManager : MonoBehaviour
         Crops crop = new Crops();
 
         crops.Add(position, crop);
-        targetTilemap.SetTile(position, plowed);
+        Debug.Log($"CreatePlowedTile: plowedTile={(plowedTile != null ? plowedTile.name : "NULL")} targetTilemap={targetTilemap != null}");
+        if (plowedTile != null && targetTilemap != null)
+            targetTilemap.SetTile(position, plowedTile);
     }
 }

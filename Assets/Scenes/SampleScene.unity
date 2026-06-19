@@ -2635,8 +2635,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tilemap: {fileID: 1186464416}
   tileDatas: []
+  plowableData: {fileID: 11400000, guid: 91793fe19b86f8846ad6867913f88e5b, type: 2}
+  nonPlowableData: {fileID: 11400000, guid: 18e665539a4abd84c9db90fee11b4688, type: 2}
   useRange: 1
-  playerCenterOffset: 0.75
+  playerCenterOffset: 0.5
   cropsManager: {fileID: 0}
 --- !u!1 &850390112
 GameObject:
@@ -2878,7 +2880,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 555976653e9a9ef4b966f8b65036a41b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  plowed: {fileID: 11400000, guid: eb73a79da47a82a41af9ef49537b7383, type: 2}
+  plowed: {fileID: 11400000, guid: 3b57d16e01dfce741ba6bac85c7adecb, type: 2}
+  plowedSprite: {fileID: 209868373563013566, guid: f448e69b8dd0c3b4c8185a06e86d4c71, type: 3}
   seeded: {fileID: 11400000, guid: 50ef9f8d2541c29449c23bd20cbbc45d, type: 2}
   targetTilemap: {fileID: 889043681}
 --- !u!1839735485 &889043681
@@ -2977,7 +2980,7 @@ Transform:
   m_GameObject: {fileID: 889043679}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.01}
+  m_LocalPosition: {x: 0, y: -0.2, z: -0.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3313,6 +3316,8 @@ MonoBehaviour:
   tileDatas:
   - {fileID: 11400000, guid: 18e665539a4abd84c9db90fee11b4688, type: 2}
   - {fileID: 11400000, guid: 91793fe19b86f8846ad6867913f88e5b, type: 2}
+  plowableData: {fileID: 0}
+  nonPlowableData: {fileID: 0}
   useRange: 1
   playerCenterOffset: 0.75
   cropsManager: {fileID: 0}
