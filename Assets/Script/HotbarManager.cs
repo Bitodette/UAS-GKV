@@ -13,6 +13,9 @@ public class HotbarManager : MonoBehaviour
     [SerializeField] private GameObject slotPrefab;
     [SerializeField] private Sprite selectedSlotSprite;
 
+    [Header("Default Items")]
+    [SerializeField] private ItemData[] defaultItems;
+
     [Header("Layout")]
     [SerializeField] private float slotWidth = 70f;
     [SerializeField] private float slotHeight = 70f;
@@ -105,13 +108,13 @@ public class HotbarManager : MonoBehaviour
         UpdateHighlightVisual();
         RefreshUI();
 
-        // Default items kalo hotbar kosong
-        ItemData tools = Resources.Load<ItemData>("Items/tools");
-        if (tools != null && inventoryItems[0] == null)
+        if (defaultItems != null)
         {
-            inventoryItems[0] = tools;
-            itemCounts[0] = 1;
-            RefreshUI();
+            foreach (ItemData item in defaultItems)
+            {
+                if (item != null)
+                    AddItem(item);
+            }
         }
     }
 
