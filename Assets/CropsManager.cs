@@ -24,7 +24,6 @@ public class CropsManager : MonoBehaviour
     private Dictionary<Vector3Int, Crops> crops;
     private TileBase plowedTile;
     private Transform playerRef;
-    private float lastPlayerY;
 
     private void Start()
     {
@@ -44,8 +43,6 @@ public class CropsManager : MonoBehaviour
         if (overlayTilemap == null || playerRef == null) return;
 
         float playerY = playerRef.position.y;
-        if (Mathf.Abs(playerY - lastPlayerY) < 0.01f) return;
-        lastPlayerY = playerY;
 
         foreach (var kvp in crops)
         {
@@ -59,6 +56,8 @@ public class CropsManager : MonoBehaviour
             bool belowOrSame = worldPos.y <= playerY;
 
             TileBase tile = srcMap.GetTile(pos);
+            if (tile == null)
+                tile = overlayTilemap != null ? overlayTilemap.GetTile(pos) : null;
             if (tile == null) continue;
 
             if (belowOrSame)
