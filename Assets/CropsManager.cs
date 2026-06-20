@@ -23,6 +23,8 @@ public class CropsManager : MonoBehaviour
 
     private Dictionary<Vector3Int, Crops> crops;
     private TileBase plowedTile;
+    private Transform playerRef;
+    private float lastPlayerY;
 
     private void Start()
     {
@@ -32,6 +34,50 @@ public class CropsManager : MonoBehaviour
             plowedTile = plowed;
         else if (plowedSprite != null)
             plowedTile = CreateTileFromSprite(plowedSprite);
+
+        if (playerRef == null && GameManager.Instance != null && GameManager.Instance.player != null)
+            playerRef = GameManager.Instance.player.transform;
+    }
+
+    private void Update()
+    {
+        if (overlayTilemap == null || playerRef == null) return;
+
+        float playerY = playerRef.position.y;
+        if (Mathf.Abs(playerY - lastPlayerY) < 0.01f) return;
+        lastPlayerY = playerY;
+
+        foreach (var kvp in crops)
+        {
+            if (!kvp.Value.seeded) continue;
+
+            Vector3Int pos = kvp.Key;
+            Tilemap srcMap = seedTilemap ?? targetTilemap;
+            if (srcMap == null) continue;
+
+            Vector3 worldPos = srcMap.GetCellCenterWorld(pos);
+            bool belowOrSame = worldPos.y <= playerY;
+
+            TileBase tile = srcMap.GetTile(pos);
+            if (tile == null) continue;
+
+            if (belowOrSame)
+            {
+                if (overlayTilemap.GetTile(pos) != tile)
+                {
+                    if (seedTilemap != null) seedTilemap.SetTile(pos, null);
+                    overlayTilemap.SetTile(pos, tile);
+                }
+            }
+            else
+            {
+                if (overlayTilemap.GetTile(pos) != null)
+                {
+                    overlayTilemap.SetTile(pos, null);
+                    if (seedTilemap != null) seedTilemap.SetTile(pos, tile);
+                }
+            }
+        }
     }
 
     private TileBase CreateTileFromSprite(Sprite sprite)
@@ -93,14 +139,14 @@ public class CropsManager : MonoBehaviour
         Debug.Log($"Watered tile at {position}");
     }
 
-    private void SetCropTile(Vector3Int position, TileBase tile, int stage)
+    private void SetCropTile(Vector3Int position, TileBase tile)
     {
         if (seedTilemap != null)
             seedTilemap.SetTile(position, null);
         if (overlayTilemap != null)
             overlayTilemap.SetTile(position, null);
 
-        Tilemap map = stage >= 1 && overlayTilemap != null ? overlayTilemap : (seedTilemap ?? targetTilemap);
+        Tilemap map = seedTilemap ?? targetTilemap;
         if (map != null)
             map.SetTile(position, tile);
     }
@@ -116,7 +162,7 @@ public class CropsManager : MonoBehaviour
         crops[position].seeded = true;
         crops[position].growthStage = 0;
 
-        SetCropTile(position, seeded, 0);
+        SetCropTile(position, seeded);
     }
 
     public void GrowAll()
@@ -133,7 +179,7 @@ public class CropsManager : MonoBehaviour
             if (!kvp.Value.seeded) continue;
             if (kvp.Value.growthStage >= growthTiles.Length) continue;
 
-            SetCropTile(kvp.Key, growthTiles[kvp.Value.growthStage], kvp.Value.growthStage);
+            SetCropTile(kvp.Key, growthTiles[kvp.Value.growthStage]);
 
             kvp.Value.growthStage++;
         }
