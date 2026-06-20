@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Wheat Seed
   icon: {fileID: -6262110467048244850, guid: e5e1f68d538e3b04ca450781e42a208e, type: 3}
-  isStackable: 0
+  isStackable: 1
+  isSeed: 1

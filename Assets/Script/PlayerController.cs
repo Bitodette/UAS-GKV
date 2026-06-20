@@ -100,8 +100,8 @@ public class PlayerController : MonoBehaviour
             {
                 Vector3Int gridPos = tilemapReadController.GetMouseGridPosition();
 
-                // Cek apakah tile ini bisa di-plow
-                bool canPlow = tilemapReadController.CanPlowAt(gridPos);
+                // Cek apakah tile ini bisa di-plow (hanya kalo tools terpilih)
+                bool canPlow = tilemapReadController.IsToolSelected() && tilemapReadController.CanPlowAt(gridPos);
                 if (canPlow)
                     pendingPlowPos = gridPos;
                 else

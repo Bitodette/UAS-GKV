@@ -224,6 +224,12 @@ public class TilemapReadController : MonoBehaviour
         return center;
     }
 
+    public Vector3 GridToWorldCenter(Vector3Int gridPos)
+    {
+        if (tilemap == null) return Vector3.zero;
+        return tilemap.GetCellCenterWorld(gridPos);
+    }
+
     public bool IsToolSelected()
     {
         return hotbar != null && hotbar.SelectedItem != null && hotbar.SelectedItem.itemName == "tools";
@@ -247,6 +253,7 @@ public class TilemapReadController : MonoBehaviour
         if (tilemap == null || cropsManager == null) return false;
         if (!cropsManager.Check(gridPos)) return false;
         if (cropsManager.IsSeeded(gridPos)) return false;
+        if (cropsManager.IsFullyGrown(gridPos)) return false;
         Vector3Int playerGrid = GetPlayerGridPosition();
         int dx = Mathf.Abs(gridPos.x - playerGrid.x);
         int dy = Mathf.Abs(gridPos.y - playerGrid.y);
