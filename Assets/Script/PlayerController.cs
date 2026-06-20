@@ -159,7 +159,7 @@ public class PlayerController : MonoBehaviour
                     {
                         HandleDiagonalClick();
                     }
-                    else
+                    else if (delta.y != 0)
                     {
                         walkIntermediateGrid = playerGrid;
                         walkFinalGrid = gridPos;
@@ -168,9 +168,24 @@ public class PlayerController : MonoBehaviour
                         isWalkingToTarget = true;
 
                         if (delta.y > 0) { lastDirection = "belakang"; ChangeAnimationState("jalan-atas"); }
-                        else if (delta.y < 0) { lastDirection = "depan"; ChangeAnimationState("jalan-bawah"); }
-                        else if (delta.x > 0) { lastDirection = "kanan"; ChangeAnimationState("jalan-kanan"); }
-                        else { lastDirection = "kiri"; ChangeAnimationState("jalan-kiri"); }
+                        else { lastDirection = "depan"; ChangeAnimationState("jalan-bawah"); }
+                    }
+                    else
+                    {
+                        if (isWatering)
+                        {
+                            walkIntermediateGrid = playerGrid;
+                            walkFinalGrid = gridPos;
+                            walkTarget = tilemapReadController.GridToWorldFeet(gridPos);
+                            walkTarget.z = 0;
+                            isWalkingToTarget = true;
+                            if (delta.x > 0) { lastDirection = "kanan"; ChangeAnimationState("jalan-kanan"); }
+                            else { lastDirection = "kiri"; ChangeAnimationState("jalan-kiri"); }
+                        }
+                        else
+                        {
+                            UpdateMouseDirection();
+                        }
                     }
                 }
                 if (isUsingTool || isWalkingToTarget) return;
@@ -236,6 +251,60 @@ public class PlayerController : MonoBehaviour
         // Mulai jalan
         lastDirection = delta.y > 0 ? "belakang" : "depan";
         ChangeAnimationState(delta.y > 0 ? "jalan-atas" : "jalan-bawah");
+    }
+
+    void UpdateMouseDirection()
+    {
+        string animName;
+        string toolPrefix = isWatering ? "nyiram" : "nyangkul";
+
+        if (tilemapReadController != null)
+        {
+            Vector3Int gridPos = tilemapReadController.GetMouseGridPosition();
+            Vector3Int playerGrid = tilemapReadController.GetPlayerGridPosition();
+            Vector3Int delta = gridPos - playerGrid;
+
+            if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
+            {
+                lastDirection = delta.x > 0 ? "kanan" : "kiri";
+                animName = toolPrefix + "-kanan";
+            }
+            else if (delta.y > 0)
+            {
+                lastDirection = "belakang";
+                animName = isWatering ? "nyiram-depan" : "nyangkul-kanan";
+            }
+            else
+            {
+                lastDirection = "depan";
+                animName = toolPrefix + "-depan";
+            }
+        }
+        else
+        {
+            Vector3 mousePos = mainCam.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 aimDir = mousePos - transform.position;
+            if (aimDir.magnitude > 3f) return;
+
+            if (Mathf.Abs(aimDir.x) > Mathf.Abs(aimDir.y))
+            {
+                lastDirection = aimDir.x > 0 ? "kanan" : "kiri";
+                animName = toolPrefix + "-kanan";
+            }
+            else if (aimDir.y > 0)
+            {
+                lastDirection = "belakang";
+                animName = isWatering ? "nyiram-depan" : "nyangkul-kanan";
+            }
+            else
+            {
+                lastDirection = "depan";
+                animName = toolPrefix + "-depan";
+            }
+        }
+
+        ChangeAnimationState(animName);
+        isUsingTool = true;
     }
 
     void ChangeAnimationState(string newAnimation)
