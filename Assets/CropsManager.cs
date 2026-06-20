@@ -21,6 +21,7 @@ public class CropsManager : MonoBehaviour
     [SerializeField] private Tilemap overlayTilemap;
     [SerializeField] private TileBase[] growthTiles;
     [SerializeField] private Transform playerRef;
+    [SerializeField] private float playerCenterOffset = 0f;
 
     private Dictionary<Vector3Int, Crops> crops;
     private TileBase plowedTile;
@@ -51,7 +52,7 @@ public class CropsManager : MonoBehaviour
         Tilemap srcMap = seedTilemap ?? targetTilemap;
         if (srcMap == null) return;
 
-        Vector3Int playerGrid = srcMap.WorldToCell(playerRef.position + Vector3.up * 0.75f);
+        Vector3Int playerGrid = srcMap.WorldToCell(playerRef.position + Vector3.up * playerCenterOffset);
         int moved = 0;
 
         foreach (var kvp in crops)
@@ -59,6 +60,7 @@ public class CropsManager : MonoBehaviour
             if (!kvp.Value.seeded) continue;
 
             Vector3Int pos = kvp.Key;
+            int dx = Mathf.Abs(pos.x - playerGrid.x);
             int dy = pos.y - playerGrid.y;
 
             TileBase tile = srcMap.GetTile(pos);
@@ -66,20 +68,23 @@ public class CropsManager : MonoBehaviour
                 tile = overlayTilemap.GetTile(pos);
             if (tile == null) continue;
 
-            bool isFinalStage = kvp.Value.growthStage >= growthTiles.Length;
-
-            if (!isFinalStage)
+            // Cek apakah tile ini crops besar (growthTiles index >= 1 = crops_3+)
+            bool thisIsLargeCrop = false;
+            if (growthTiles != null)
             {
-                if (overlayTilemap.GetTile(pos) != null)
+                for (int i = 1; i < growthTiles.Length; i++)
                 {
-                    overlayTilemap.SetTile(pos, null);
-                    srcMap.SetTile(pos, tile);
-                    moved++;
+                    if (tile == growthTiles[i])
+                    {
+                        thisIsLargeCrop = true;
+                        break;
+                    }
                 }
-                continue;
             }
 
-            bool cropInFront = dy < 0;
+            bool cropInFront = dy < 0 || (dy == 0 && dx <= 1);
+            if (thisIsLargeCrop && dy == 1 && dx <= 1)
+                cropInFront = true;
 
             if (cropInFront)
             {
