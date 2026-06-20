@@ -5,6 +5,8 @@ using UnityEngine.Tilemaps;
 public class Crops
 {
     public bool isWatered;
+    public bool seeded;
+    public int growthStage;
 }
 
 public class CropsManager : MonoBehaviour
@@ -16,6 +18,7 @@ public class CropsManager : MonoBehaviour
     [SerializeField] private Tilemap targetTilemap;
     [SerializeField] private Tilemap seedTilemap;
     [SerializeField] private Tilemap wateredTilemap;
+    [SerializeField] private TileBase[] growthTiles;
 
     private Dictionary<Vector3Int, Crops> crops;
     private TileBase plowedTile;
@@ -48,6 +51,13 @@ public class CropsManager : MonoBehaviour
     public bool IsWatered(Vector3Int position)
     {
         return crops.TryGetValue(position, out Crops crop) && crop.isWatered;
+    }
+
+    public bool IsSeeded(Vector3Int position)
+    {
+        if (crops.TryGetValue(position, out Crops crop))
+            return crop.seeded;
+        return false;
     }
 
     public void Plow(Vector3Int position)
@@ -87,10 +97,53 @@ public class CropsManager : MonoBehaviour
         if (!crops.ContainsKey(position))
             return;
 
+        if (crops[position].seeded)
+            return;
+
+        crops[position].seeded = true;
+        crops[position].growthStage = 0;
+
         if (seedTilemap != null)
             seedTilemap.SetTile(position, seeded);
         else
             targetTilemap.SetTile(position, seeded);
+    }
+
+    public void GrowAll()
+    {
+        foreach (var kvp in crops)
+        {
+            if (!kvp.Value.seeded) continue;
+            if (kvp.Value.growthStage >= growthTiles.Length) continue;
+
+            Tilemap map = seedTilemap != null ? seedTilemap : targetTilemap;
+            if (map != null)
+                map.SetTile(kvp.Key, growthTiles[kvp.Value.growthStage]);
+
+            kvp.Value.growthStage++;
+        }
+    }
+
+    public bool IsFullyGrown(Vector3Int position)
+    {
+        if (!crops.ContainsKey(position)) return false;
+        if (!crops[position].seeded) return false;
+        return crops[position].growthStage >= growthTiles.Length;
+    }
+
+    public bool Harvest(Vector3Int position)
+    {
+        if (!IsFullyGrown(position)) return false;
+
+        crops[position].seeded = false;
+        crops[position].growthStage = 0;
+
+        if (seedTilemap != null)
+            seedTilemap.SetTile(position, null);
+        else if (targetTilemap != null)
+            targetTilemap.SetTile(position, plowedTile);
+
+        return true;
     }
 
     private void CreatePlowedTile(Vector3Int position)

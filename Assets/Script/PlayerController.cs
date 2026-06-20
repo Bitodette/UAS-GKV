@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour
     private float toolTimer = 0f;
     private bool toolFirstFrame = true;
     private bool isWatering = false;
+    private bool isSeeding = false;
 
     private bool isWalkingToTarget = false;
     private Vector3 walkTarget;
@@ -29,6 +30,7 @@ public class PlayerController : MonoBehaviour
 
     private Vector3Int? pendingPlowPos;
     private Vector3Int? pendingWaterPos;
+    private Vector3Int? pendingSeedPos;
 
     void Start()
     {
@@ -84,10 +86,18 @@ public class PlayerController : MonoBehaviour
                     isUsingTool = false;
                     toolFirstFrame = true;
                     isWatering = false;
+                    isSeeding = false;
                     if (pendingPlowPos.HasValue && cropsManager != null)
                     {
                         cropsManager.Plow(pendingPlowPos.Value);
                         pendingPlowPos = null;
+                    }
+                    if (pendingSeedPos.HasValue && cropsManager != null)
+                    {
+                        cropsManager.Seed(pendingSeedPos.Value);
+                        if (hotbar != null)
+                            hotbar.ConsumeItem(hotbar.SelectedIndex, 1);
+                        pendingSeedPos = null;
                     }
                     if (pendingWaterPos.HasValue && cropsManager != null)
                     {
@@ -114,6 +124,7 @@ public class PlayerController : MonoBehaviour
 
                 bool isHoe = selectedItemName == "tools";
                 bool isWaterCan = selectedItemName == "water can";
+                bool isSeed = hotbar != null && hotbar.SelectedItem != null && hotbar.SelectedItem.isSeed;
 
                 bool canAct = false;
                 if (isHoe && tilemapReadController.CanPlowAt(gridPos))
@@ -121,19 +132,33 @@ public class PlayerController : MonoBehaviour
                     canAct = true;
                     pendingPlowPos = gridPos;
                     pendingWaterPos = null;
+                    pendingSeedPos = null;
                     isWatering = false;
+                    isSeeding = false;
+                }
+                else if (isSeed && tilemapReadController.CanSeedAt(gridPos))
+                {
+                    canAct = true;
+                    pendingSeedPos = gridPos;
+                    pendingPlowPos = null;
+                    pendingWaterPos = null;
+                    isWatering = false;
+                    isSeeding = true;
                 }
                 else if (isWaterCan && tilemapReadController.CanWaterAt(gridPos))
                 {
                     canAct = true;
                     pendingWaterPos = gridPos;
                     pendingPlowPos = null;
+                    pendingSeedPos = null;
                     isWatering = true;
+                    isSeeding = false;
                 }
                 else
                 {
                     pendingPlowPos = null;
                     pendingWaterPos = null;
+                    pendingSeedPos = null;
                 }
 
                 if (canAct)
@@ -203,6 +228,7 @@ public class PlayerController : MonoBehaviour
             else if (lastDirection == "belakang") ChangeAnimationState("idle-belakang");
             else if (lastDirection == "depan") ChangeAnimationState("idle-depan");
         }
+
     }
 
     void FixedUpdate()
