@@ -113,6 +113,13 @@ public class CropsManager : MonoBehaviour
     {
         foreach (var kvp in crops)
         {
+            if (kvp.Value.isWatered)
+            {
+                kvp.Value.isWatered = false;
+                if (wateredTilemap != null)
+                    wateredTilemap.SetTile(kvp.Key, null);
+            }
+
             if (!kvp.Value.seeded) continue;
             if (kvp.Value.growthStage >= growthTiles.Length) continue;
 
