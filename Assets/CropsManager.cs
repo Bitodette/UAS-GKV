@@ -4,6 +4,7 @@ using UnityEngine.Tilemaps;
 
 public class Crops
 {
+    public bool seeded;
 }
 
 public class CropsManager : MonoBehaviour
@@ -42,6 +43,13 @@ public class CropsManager : MonoBehaviour
         return crops.ContainsKey(position);
     }
 
+    public bool IsSeeded(Vector3Int position)
+    {
+        if (crops.TryGetValue(position, out Crops crop))
+            return crop.seeded;
+        return false;
+    }
+
     public void Plow(Vector3Int position)
     {
         if (crops.ContainsKey(position))
@@ -54,6 +62,11 @@ public class CropsManager : MonoBehaviour
     {
         if (!crops.ContainsKey(position))
             return;
+
+        if (crops[position].seeded)
+            return;
+
+        crops[position].seeded = true;
 
         if (seedTilemap != null)
             seedTilemap.SetTile(position, seeded);

@@ -105,7 +105,8 @@ public class TilemapReadController : MonoBehaviour
         Tilemap hlMap = highlightTilemap != null ? highlightTilemap : tilemap;
 
         bool toolSelected = hotbar != null && hotbar.SelectedItem != null && hotbar.SelectedItem.itemName == "tools";
-        if (!toolSelected)
+        bool seedSelected = hotbar != null && hotbar.SelectedItem != null && hotbar.SelectedItem.isSeed;
+        if (!toolSelected && !seedSelected)
         {
             if (isHighlighted)
             {
@@ -123,6 +124,9 @@ public class TilemapReadController : MonoBehaviour
         int dx = Mathf.Abs(gridPos.x - playerGrid.x);
         int dy = Mathf.Abs(gridPos.y - playerGrid.y);
         bool inRange = dx <= useRange && dy <= useRange && hlMap.GetTile(gridPos) != null;
+
+        if (seedSelected && !(cropsManager != null && cropsManager.Check(gridPos)))
+            inRange = false;
 
         if (!IsPointerOverUI() && Input.GetMouseButtonDown(0))
         {
@@ -176,7 +180,8 @@ public class TilemapReadController : MonoBehaviour
 
     public bool IsMouseOverInRangeTile()
     {
-        if (tilemap == null || !IsToolSelected()) return false;
+        if (tilemap == null) return false;
+        if (!IsToolSelected() && !IsSeedSelected()) return false;
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         worldPos.z = 0;
         Vector3Int gridPos = tilemap.WorldToCell(worldPos);
@@ -224,12 +229,28 @@ public class TilemapReadController : MonoBehaviour
         return hotbar != null && hotbar.SelectedItem != null && hotbar.SelectedItem.itemName == "tools";
     }
 
+    public bool IsSeedSelected()
+    {
+        return hotbar != null && hotbar.SelectedItem != null && hotbar.SelectedItem.isSeed;
+    }
+
     public bool CanPlowAt(Vector3Int gridPos)
     {
         if (tilemap == null || cropsManager == null) return false;
         if (cropsManager.Check(gridPos)) return false;
         TileData tileData = GetTileData(tilemap.GetTile(gridPos));
         return tileData == null || tileData.plowable;
+    }
+
+    public bool CanSeedAt(Vector3Int gridPos)
+    {
+        if (tilemap == null || cropsManager == null) return false;
+        if (!cropsManager.Check(gridPos)) return false;
+        if (cropsManager.IsSeeded(gridPos)) return false;
+        Vector3Int playerGrid = GetPlayerGridPosition();
+        int dx = Mathf.Abs(gridPos.x - playerGrid.x);
+        int dy = Mathf.Abs(gridPos.y - playerGrid.y);
+        return dx <= useRange && dy <= useRange;
     }
 
     public bool IsAlreadyPlowed(Vector3Int gridPos)

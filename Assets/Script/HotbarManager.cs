@@ -5,6 +5,13 @@ using UnityEngine.UI;
 using UnityEditor;
 #endif
 
+[System.Serializable]
+public class DefaultItemEntry
+{
+    public ItemData item;
+    public int count = 1;
+}
+
 [ExecuteInEditMode]
 public class HotbarManager : MonoBehaviour
 {
@@ -14,7 +21,7 @@ public class HotbarManager : MonoBehaviour
     [SerializeField] private Sprite selectedSlotSprite;
 
     [Header("Default Items")]
-    [SerializeField] private ItemData[] defaultItems;
+    [SerializeField] private DefaultItemEntry[] defaultItems;
 
     [Header("Layout")]
     [SerializeField] private float slotWidth = 70f;
@@ -110,10 +117,10 @@ public class HotbarManager : MonoBehaviour
 
         if (defaultItems != null)
         {
-            foreach (ItemData item in defaultItems)
+            foreach (DefaultItemEntry entry in defaultItems)
             {
-                if (item != null)
-                    AddItem(item);
+                if (entry != null && entry.item != null)
+                    AddItem(entry.item, entry.count);
             }
         }
     }
@@ -273,5 +280,20 @@ public class HotbarManager : MonoBehaviour
 
         Debug.Log("Hotbar penuh!");
         return false;
+    }
+
+    public bool ConsumeItem(int index, int count = 1)
+    {
+        if (index < 0 || index >= hotbarSize) return false;
+        if (inventoryItems[index] == null) return false;
+
+        itemCounts[index] -= count;
+        if (itemCounts[index] <= 0)
+        {
+            inventoryItems[index] = null;
+            itemCounts[index] = 0;
+        }
+        RefreshUI();
+        return true;
     }
 }
