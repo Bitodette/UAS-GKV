@@ -4,6 +4,7 @@ using UnityEngine.Tilemaps;
 
 public class Crops
 {
+    public bool isWatered;
 }
 
 public class CropsManager : MonoBehaviour
@@ -11,8 +12,10 @@ public class CropsManager : MonoBehaviour
     [SerializeField] private TileBase plowed;
     [SerializeField] private Sprite plowedSprite;
     [SerializeField] private TileBase seeded;
+    [SerializeField] private TileBase watered;
     [SerializeField] private Tilemap targetTilemap;
     [SerializeField] private Tilemap seedTilemap;
+    [SerializeField] private Tilemap wateredTilemap;
 
     private Dictionary<Vector3Int, Crops> crops;
     private TileBase plowedTile;
@@ -42,12 +45,41 @@ public class CropsManager : MonoBehaviour
         return crops.ContainsKey(position);
     }
 
+    public bool IsWatered(Vector3Int position)
+    {
+        return crops.TryGetValue(position, out Crops crop) && crop.isWatered;
+    }
+
     public void Plow(Vector3Int position)
     {
         if (crops.ContainsKey(position))
             return;
 
         CreatePlowedTile(position);
+    }
+
+    public void Water(Vector3Int position)
+    {
+        if (!crops.TryGetValue(position, out Crops crop))
+        {
+            crop = new Crops();
+            crops.Add(position, crop);
+        }
+
+        crop.isWatered = true;
+
+        if (watered == null)
+            Debug.LogError("Watered tile (TileBase) is not assigned in CropsManager!");
+        if (wateredTilemap == null)
+            Debug.LogError("Watered Tilemap is not assigned in CropsManager!");
+
+        if (watered != null && wateredTilemap != null)
+        {
+            wateredTilemap.SetTile(position, watered);
+            Debug.Log($"Watered tile set at {position} on wateredTilemap");
+        }
+
+        Debug.Log($"Watered tile at {position}");
     }
 
     public void Seed(Vector3Int position)

@@ -104,7 +104,7 @@ public class TilemapReadController : MonoBehaviour
         if (tilemap == null) return;
         Tilemap hlMap = highlightTilemap != null ? highlightTilemap : tilemap;
 
-        bool toolSelected = hotbar != null && hotbar.SelectedItem != null && hotbar.SelectedItem.itemName == "tools";
+        bool toolSelected = IsAnyToolSelected();
         if (!toolSelected)
         {
             if (isHighlighted)
@@ -176,7 +176,7 @@ public class TilemapReadController : MonoBehaviour
 
     public bool IsMouseOverInRangeTile()
     {
-        if (tilemap == null || !IsToolSelected()) return false;
+        if (tilemap == null || !IsAnyToolSelected()) return false;
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         worldPos.z = 0;
         Vector3Int gridPos = tilemap.WorldToCell(worldPos);
@@ -188,7 +188,7 @@ public class TilemapReadController : MonoBehaviour
 
     public bool IsMouseOverPlayerTile()
     {
-        if (tilemap == null || !IsToolSelected()) return false;
+        if (tilemap == null || !IsAnyToolSelected()) return false;
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         worldPos.z = 0;
         Vector3Int gridPos = tilemap.WorldToCell(worldPos);
@@ -205,7 +205,7 @@ public class TilemapReadController : MonoBehaviour
 
     public bool IsMouseOverDiagonalTile()
     {
-        if (tilemap == null || !IsToolSelected()) return false;
+        if (tilemap == null || !IsAnyToolSelected()) return false;
         Vector3Int gridPos = GetMouseGridPosition();
         Vector3Int playerGrid = GetPlayerGridPosition();
         Vector3Int d = gridPos - playerGrid;
@@ -224,12 +224,30 @@ public class TilemapReadController : MonoBehaviour
         return hotbar != null && hotbar.SelectedItem != null && hotbar.SelectedItem.itemName == "tools";
     }
 
+    public bool IsWateringCanSelected()
+    {
+        return hotbar != null && hotbar.SelectedItem != null && hotbar.SelectedItem.itemName == "water can";
+    }
+
+    private bool IsAnyToolSelected()
+    {
+        return hotbar != null && hotbar.SelectedItem != null &&
+               (hotbar.SelectedItem.itemName == "tools" || hotbar.SelectedItem.itemName == "water can");
+    }
+
     public bool CanPlowAt(Vector3Int gridPos)
     {
         if (tilemap == null || cropsManager == null) return false;
         if (cropsManager.Check(gridPos)) return false;
         TileData tileData = GetTileData(tilemap.GetTile(gridPos));
         return tileData == null || tileData.plowable;
+    }
+
+    public bool CanWaterAt(Vector3Int gridPos)
+    {
+        if (tilemap == null || cropsManager == null) return false;
+        if (!cropsManager.Check(gridPos)) return false;
+        return !cropsManager.IsWatered(gridPos);
     }
 
     public bool IsAlreadyPlowed(Vector3Int gridPos)

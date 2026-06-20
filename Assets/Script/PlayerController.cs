@@ -16,9 +16,11 @@ public class PlayerController : MonoBehaviour
     private Camera mainCam;
     private TilemapReadController tilemapReadController;
     private CropsManager cropsManager;
+    private HotbarManager hotbar;
     private bool isUsingTool = false;
     private float toolTimer = 0f;
     private bool toolFirstFrame = true;
+    private bool isWatering = false;
 
     private bool isWalkingToTarget = false;
     private Vector3 walkTarget;
@@ -26,6 +28,7 @@ public class PlayerController : MonoBehaviour
     private Vector3Int walkFinalGrid;
 
     private Vector3Int? pendingPlowPos;
+    private Vector3Int? pendingWaterPos;
 
     void Start()
     {
@@ -35,6 +38,7 @@ public class PlayerController : MonoBehaviour
         mainCam = Camera.main; 
         tilemapReadController = FindFirstObjectByType<TilemapReadController>();
         cropsManager = FindFirstObjectByType<CropsManager>();
+        hotbar = FindFirstObjectByType<HotbarManager>();
     }
 
     void Update()
@@ -54,10 +58,10 @@ public class PlayerController : MonoBehaviour
 
                 // Setelah sampe, mulai tool animation sesuai arah
                 Vector3Int delta = walkFinalGrid - walkIntermediateGrid;
-                if (delta.x > 0) { lastDirection = "kanan"; ChangeAnimationState("nyangkul-kanan"); }
-                else if (delta.x < 0) { lastDirection = "kiri"; ChangeAnimationState("nyangkul-kanan"); }
-                else if (delta.y > 0) { lastDirection = "belakang"; ChangeAnimationState("nyangkul-belakang"); }
-                else { lastDirection = "depan"; ChangeAnimationState("nyangkul-depan"); }
+                if (delta.x > 0) { lastDirection = "kanan"; ChangeAnimationState(isWatering ? "nyiram-kanan" : "nyangkul-kanan"); }
+                else if (delta.x < 0) { lastDirection = "kiri"; ChangeAnimationState(isWatering ? "nyiram-kanan" : "nyangkul-kanan"); }
+                else if (delta.y > 0) { lastDirection = "belakang"; ChangeAnimationState(isWatering ? "nyiram-depan" : "nyangkul-belakang"); }
+                else { lastDirection = "depan"; ChangeAnimationState(isWatering ? "nyiram-depan" : "nyangkul-depan"); }
                 isUsingTool = true;
                 toolFirstFrame = true;
             }
@@ -79,10 +83,16 @@ public class PlayerController : MonoBehaviour
                 {
                     isUsingTool = false;
                     toolFirstFrame = true;
+                    isWatering = false;
                     if (pendingPlowPos.HasValue && cropsManager != null)
                     {
                         cropsManager.Plow(pendingPlowPos.Value);
                         pendingPlowPos = null;
+                    }
+                    if (pendingWaterPos.HasValue && cropsManager != null)
+                    {
+                        cropsManager.Water(pendingWaterPos.Value);
+                        pendingWaterPos = null;
                     }
                     if (movement == Vector2.zero)
                         ChangeAnimationState("idle-" + lastDirection);
@@ -100,14 +110,33 @@ public class PlayerController : MonoBehaviour
             {
                 Vector3Int gridPos = tilemapReadController.GetMouseGridPosition();
 
-                // Cek apakah tile ini bisa di-plow
-                bool canPlow = tilemapReadController.CanPlowAt(gridPos);
-                if (canPlow)
-                    pendingPlowPos = gridPos;
-                else
-                    pendingPlowPos = null;
+                string selectedItemName = hotbar != null && hotbar.SelectedItem != null ? hotbar.SelectedItem.itemName : "";
 
-                if (canPlow)
+                bool isHoe = selectedItemName == "tools";
+                bool isWaterCan = selectedItemName == "water can";
+
+                bool canAct = false;
+                if (isHoe && tilemapReadController.CanPlowAt(gridPos))
+                {
+                    canAct = true;
+                    pendingPlowPos = gridPos;
+                    pendingWaterPos = null;
+                    isWatering = false;
+                }
+                else if (isWaterCan && tilemapReadController.CanWaterAt(gridPos))
+                {
+                    canAct = true;
+                    pendingWaterPos = gridPos;
+                    pendingPlowPos = null;
+                    isWatering = true;
+                }
+                else
+                {
+                    pendingPlowPos = null;
+                    pendingWaterPos = null;
+                }
+
+                if (canAct)
                 {
                     Vector3Int playerGrid = tilemapReadController.GetPlayerGridPosition();
                     Vector3Int delta = gridPos - playerGrid;
@@ -115,7 +144,7 @@ public class PlayerController : MonoBehaviour
                     if (gridPos == playerGrid)
                     {
                         lastDirection = "depan";
-                        ChangeAnimationState("nyangkul-depan");
+                        ChangeAnimationState(isWatering ? "nyiram-depan" : "nyangkul-depan");
                         isUsingTool = true;
                     }
                     else if (delta.x != 0 && delta.y != 0)
@@ -205,6 +234,7 @@ public class PlayerController : MonoBehaviour
     void UpdateMouseDirection()
     {
         string animName;
+        string toolPrefix = isWatering ? "nyiram" : "nyangkul";
 
         if (tilemapReadController != null)
         {
@@ -215,17 +245,17 @@ public class PlayerController : MonoBehaviour
             if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
             {
                 lastDirection = delta.x > 0 ? "kanan" : "kiri";
-                animName = "nyangkul-kanan";
+                animName = toolPrefix + "-kanan";
             }
             else if (delta.y > 0)
             {
                 lastDirection = "belakang";
-                animName = "nyangkul-kanan";
+                animName = isWatering ? "nyiram-depan" : "nyangkul-kanan";
             }
             else
             {
                 lastDirection = "depan";
-                animName = "nyangkul-depan";
+                animName = toolPrefix + "-depan";
             }
         }
         else
@@ -237,17 +267,17 @@ public class PlayerController : MonoBehaviour
             if (Mathf.Abs(aimDir.x) > Mathf.Abs(aimDir.y))
             {
                 lastDirection = aimDir.x > 0 ? "kanan" : "kiri";
-                animName = "nyangkul-kanan";
+                animName = toolPrefix + "-kanan";
             }
             else if (aimDir.y > 0)
             {
                 lastDirection = "belakang";
-                animName = "nyangkul-kanan";
+                animName = isWatering ? "nyiram-depan" : "nyangkul-kanan";
             }
             else
             {
                 lastDirection = "depan";
-                animName = "nyangkul-depan";
+                animName = toolPrefix + "-depan";
             }
         }
 
@@ -257,15 +287,15 @@ public class PlayerController : MonoBehaviour
 
     void ChangeAnimationState(string newAnimation)
     {
-        if (currentAnimation == newAnimation && !newAnimation.StartsWith("nyangkul-")) return;
+        if (currentAnimation == newAnimation && !newAnimation.StartsWith("nyangkul-") && !newAnimation.StartsWith("nyiram-")) return;
 
         anim.Play(newAnimation);
         currentAnimation = newAnimation;
 
         if (spriteRenderer != null)
         {
-            bool isNyangkul = currentAnimation.StartsWith("nyangkul-");
-            spriteRenderer.flipX = isNyangkul && lastDirection == "kiri";
+            bool isToolAnim = currentAnimation.StartsWith("nyangkul-") || currentAnimation.StartsWith("nyiram-");
+            spriteRenderer.flipX = isToolAnim && lastDirection == "kiri";
         }
     }
 }
