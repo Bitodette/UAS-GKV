@@ -45,11 +45,13 @@ public class CropsManager : MonoBehaviour
 
     private void Update()
     {
-        if (overlayTilemap == null) { Debug.LogWarning("[CropsManager] overlayTilemap not assigned!"); return; }
-        if (playerRef == null) { Debug.LogWarning("[CropsManager] playerRef is null!"); return; }
+        if (overlayTilemap == null) return;
+        if (playerRef == null) return;
 
-        float playerY = playerRef.position.y;
-        Debug.Log($"[CropsManager] Update checking {crops.Count} crops, overlay={overlayTilemap.name}, playerY={playerY}");
+        Tilemap srcMap = seedTilemap ?? targetTilemap;
+        if (srcMap == null) return;
+
+        Vector3Int playerGrid = srcMap.WorldToCell(playerRef.position + Vector3.up * 0.75f);
         int moved = 0;
 
         foreach (var kvp in crops)
@@ -57,22 +59,18 @@ public class CropsManager : MonoBehaviour
             if (!kvp.Value.seeded) continue;
 
             Vector3Int pos = kvp.Key;
-            Tilemap srcMap = seedTilemap ?? targetTilemap;
-            if (srcMap == null) continue;
-
-            Vector3 worldPos = srcMap.GetCellCenterWorld(pos);
-            bool cropInFront = worldPos.y <= playerY;
+            bool cropInFront = pos.y <= playerGrid.y;
 
             TileBase tile = srcMap.GetTile(pos);
             if (tile == null)
-                tile = overlayTilemap != null ? overlayTilemap.GetTile(pos) : null;
+                tile = overlayTilemap.GetTile(pos);
             if (tile == null) continue;
 
             if (cropInFront)
             {
                 if (overlayTilemap.GetTile(pos) != tile)
                 {
-                    if (seedTilemap != null) seedTilemap.SetTile(pos, null);
+                    srcMap.SetTile(pos, null);
                     overlayTilemap.SetTile(pos, tile);
                     moved++;
                 }
@@ -82,14 +80,14 @@ public class CropsManager : MonoBehaviour
                 if (overlayTilemap.GetTile(pos) != null)
                 {
                     overlayTilemap.SetTile(pos, null);
-                    if (seedTilemap != null) seedTilemap.SetTile(pos, tile);
+                    srcMap.SetTile(pos, tile);
                     moved++;
                 }
             }
         }
 
         if (moved > 0)
-            Debug.Log($"[CropsManager] Moved {moved} crops based on player Y={playerY}");
+            Debug.Log($"[CropsManager] Moved {moved} crops, playerGrid=({playerGrid.x},{playerGrid.y})");
     }
 
     private TileBase CreateTileFromSprite(Sprite sprite)
