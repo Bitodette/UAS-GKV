@@ -3265,6 +3265,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 32c3279bc6ae53c419551d1135a13b57, type: 2}
   - {fileID: 11400000, guid: 334d31b006f4ed645a6e922f2965462c, type: 2}
   - {fileID: 11400000, guid: 71028c00399145d4c9df75bbfe4980fc, type: 2}
+  playerRef: {fileID: 2041105310}
 --- !u!1839735485 &889043681
 Tilemap:
   m_ObjectHideFlags: 0

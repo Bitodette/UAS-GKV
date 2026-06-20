@@ -59,7 +59,9 @@ public class CropsManager : MonoBehaviour
             if (!kvp.Value.seeded) continue;
 
             Vector3Int pos = kvp.Key;
-            bool cropInFront = pos.y <= playerGrid.y;
+            int dx = Mathf.Abs(pos.x - playerGrid.x);
+            int dy = pos.y - playerGrid.y;
+            bool cropInFront = dy < 0 || (dy == 0 && dx <= 1);
 
             TileBase tile = srcMap.GetTile(pos);
             if (tile == null)

@@ -34,4 +34,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c61bed2c1115f494497f5aa8d3008438, type: 2}
   - {fileID: 11400000, guid: a6c84708ff4ca2c4caf86135d114d9b4, type: 2}
   - {fileID: 11400000, guid: 6be46ce3891b0d4419f9b2465700c882, type: 2}
+  - {fileID: 11400000, guid: 402a64a6a5e4bb54c8d7eef4a3a1f991, type: 2}
+  - {fileID: 11400000, guid: 18860de7b3d65844b901e211b15bb465, type: 2}
   plowable: 0
