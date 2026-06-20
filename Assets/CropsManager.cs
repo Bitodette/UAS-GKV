@@ -100,7 +100,7 @@ public class CropsManager : MonoBehaviour
         if (overlayTilemap != null)
             overlayTilemap.SetTile(position, null);
 
-        Tilemap map = stage >= 3 && overlayTilemap != null ? overlayTilemap : (seedTilemap ?? targetTilemap);
+        Tilemap map = stage >= 1 && overlayTilemap != null ? overlayTilemap : (seedTilemap ?? targetTilemap);
         if (map != null)
             map.SetTile(position, tile);
     }
