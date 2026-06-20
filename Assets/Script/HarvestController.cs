@@ -13,6 +13,8 @@ public class HarvestController : MonoBehaviour
     {
         tilemapReadController = FindFirstObjectByType<TilemapReadController>();
         cropsManager = FindFirstObjectByType<CropsManager>();
+        if (wheatItem == null)
+            wheatItem = Resources.Load<ItemData>("Items/Wheat");
     }
 
     void Update()
