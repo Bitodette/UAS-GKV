@@ -1,14 +1,27 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour
 {
-    // BARIS INI YANG KURANG. Tanpa ini, Unity gak tahu apa itu 'optionPanel'
-    [SerializeField] private GameObject optionPanel; 
+    [SerializeField] private GameObject optionPanel;
+    [SerializeField] private Slider masterVolumeSlider;
 
-    // Fungsi pindah scene lu tetap aman di sini
+    private void Start()
+    {
+        if (masterVolumeSlider != null)
+        {
+            masterVolumeSlider.value = PlayerPrefs.GetFloat("MusicVolume", 1f);
+            masterVolumeSlider.onValueChanged.AddListener(OnMasterVolumeChanged);
+        }
+    }
+
+    private void OnMasterVolumeChanged(float value)
+    {
+        if (MusicManager.Instance != null)
+            MusicManager.Instance.SetVolume(value);
+    }
+
     public void PlayGame()
     {
         SceneManager.LoadScene(1);
@@ -17,17 +30,13 @@ public class MainMenu : MonoBehaviour
     public void OpenOption()
     {
         if (optionPanel != null)
-        {
-            optionPanel.SetActive(true); // Menyalakan overlay
-        }
+            optionPanel.SetActive(true);
     }
 
     public void CloseOption()
     {
         if (optionPanel != null)
-        {
-            optionPanel.SetActive(false); // Mematikan overlay
-        }
+            optionPanel.SetActive(false);
     }
 
     public void QuitGame()

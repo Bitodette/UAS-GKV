@@ -451,7 +451,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &126554631
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1740,6 +1740,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   optionPanel: {fileID: 126554630}
+  masterVolumeSlider: {fileID: 1926915718}
 --- !u!4 &1105417919
 Transform:
   m_ObjectHideFlags: 0
@@ -1767,6 +1768,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  layers:
+  - resourceName: 1
+    speed: 0.2
+    sortingOrder: 0
+  - resourceName: 2
+    speed: 0.5
+    sortingOrder: 1
+  - resourceName: 3
+    speed: 0.8
+    sortingOrder: 2
+  - resourceName: 4
+    speed: 1.2
+    sortingOrder: 3
 --- !u!1 &1180394954
 GameObject:
   m_ObjectHideFlags: 0
@@ -2305,8 +2319,8 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 94092816}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2455,8 +2469,8 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1180394955}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
