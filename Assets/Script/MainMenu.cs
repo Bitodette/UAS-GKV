@@ -29,4 +29,9 @@ public class MainMenu : MonoBehaviour
             optionPanel.SetActive(false); // Mematikan overlay
         }
     }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
 }
