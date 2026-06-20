@@ -40,9 +40,12 @@ public class CropsManager : MonoBehaviour
 
     private void Update()
     {
-        if (overlayTilemap == null || playerRef == null) return;
+        if (overlayTilemap == null) { Debug.LogWarning("[CropsManager] overlayTilemap not assigned!"); return; }
+        if (playerRef == null) { Debug.LogWarning("[CropsManager] playerRef is null!"); return; }
 
         float playerY = playerRef.position.y;
+        Debug.Log($"[CropsManager] Update checking {crops.Count} crops, overlay={overlayTilemap.name}, playerY={playerY}");
+        int moved = 0;
 
         foreach (var kvp in crops)
         {
@@ -66,6 +69,7 @@ public class CropsManager : MonoBehaviour
                 {
                     if (seedTilemap != null) seedTilemap.SetTile(pos, null);
                     overlayTilemap.SetTile(pos, tile);
+                    moved++;
                 }
             }
             else
@@ -74,9 +78,13 @@ public class CropsManager : MonoBehaviour
                 {
                     overlayTilemap.SetTile(pos, null);
                     if (seedTilemap != null) seedTilemap.SetTile(pos, tile);
+                    moved++;
                 }
             }
         }
+
+        if (moved > 0)
+            Debug.Log($"[CropsManager] Moved {moved} crops based on player Y={playerY}");
     }
 
     private TileBase CreateTileFromSprite(Sprite sprite)
