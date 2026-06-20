@@ -59,14 +59,27 @@ public class CropsManager : MonoBehaviour
             if (!kvp.Value.seeded) continue;
 
             Vector3Int pos = kvp.Key;
-            int dx = Mathf.Abs(pos.x - playerGrid.x);
             int dy = pos.y - playerGrid.y;
-            bool cropInFront = dy < 0 || (dy == 0 && dx <= 1);
 
             TileBase tile = srcMap.GetTile(pos);
             if (tile == null)
                 tile = overlayTilemap.GetTile(pos);
             if (tile == null) continue;
+
+            bool isFinalStage = kvp.Value.growthStage >= growthTiles.Length;
+
+            if (!isFinalStage)
+            {
+                if (overlayTilemap.GetTile(pos) != null)
+                {
+                    overlayTilemap.SetTile(pos, null);
+                    srcMap.SetTile(pos, tile);
+                    moved++;
+                }
+                continue;
+            }
+
+            bool cropInFront = dy < 0;
 
             if (cropInFront)
             {
@@ -181,18 +194,15 @@ public class CropsManager : MonoBehaviour
     {
         foreach (var kvp in crops)
         {
-            if (kvp.Value.isWatered)
-            {
-                kvp.Value.isWatered = false;
-                if (wateredTilemap != null)
-                    wateredTilemap.SetTile(kvp.Key, null);
-            }
-
             if (!kvp.Value.seeded) continue;
             if (kvp.Value.growthStage >= growthTiles.Length) continue;
+            if (!kvp.Value.isWatered) continue;
+
+            kvp.Value.isWatered = false;
+            if (wateredTilemap != null)
+                wateredTilemap.SetTile(kvp.Key, null);
 
             SetCropTile(kvp.Key, growthTiles[kvp.Value.growthStage]);
-
             kvp.Value.growthStage++;
         }
     }
