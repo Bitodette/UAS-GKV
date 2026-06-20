@@ -18,6 +18,7 @@ public class CropsManager : MonoBehaviour
     [SerializeField] private Tilemap targetTilemap;
     [SerializeField] private Tilemap seedTilemap;
     [SerializeField] private Tilemap wateredTilemap;
+    [SerializeField] private Tilemap overlayTilemap;
     [SerializeField] private TileBase[] growthTiles;
 
     private Dictionary<Vector3Int, Crops> crops;
@@ -92,6 +93,18 @@ public class CropsManager : MonoBehaviour
         Debug.Log($"Watered tile at {position}");
     }
 
+    private void SetCropTile(Vector3Int position, TileBase tile, int stage)
+    {
+        if (seedTilemap != null)
+            seedTilemap.SetTile(position, null);
+        if (overlayTilemap != null)
+            overlayTilemap.SetTile(position, null);
+
+        Tilemap map = stage >= 3 && overlayTilemap != null ? overlayTilemap : (seedTilemap ?? targetTilemap);
+        if (map != null)
+            map.SetTile(position, tile);
+    }
+
     public void Seed(Vector3Int position)
     {
         if (!crops.ContainsKey(position))
@@ -103,10 +116,7 @@ public class CropsManager : MonoBehaviour
         crops[position].seeded = true;
         crops[position].growthStage = 0;
 
-        if (seedTilemap != null)
-            seedTilemap.SetTile(position, seeded);
-        else
-            targetTilemap.SetTile(position, seeded);
+        SetCropTile(position, seeded, 0);
     }
 
     public void GrowAll()
@@ -123,9 +133,7 @@ public class CropsManager : MonoBehaviour
             if (!kvp.Value.seeded) continue;
             if (kvp.Value.growthStage >= growthTiles.Length) continue;
 
-            Tilemap map = seedTilemap != null ? seedTilemap : targetTilemap;
-            if (map != null)
-                map.SetTile(kvp.Key, growthTiles[kvp.Value.growthStage]);
+            SetCropTile(kvp.Key, growthTiles[kvp.Value.growthStage], kvp.Value.growthStage);
 
             kvp.Value.growthStage++;
         }
@@ -147,7 +155,9 @@ public class CropsManager : MonoBehaviour
 
         if (seedTilemap != null)
             seedTilemap.SetTile(position, null);
-        else if (targetTilemap != null)
+        if (overlayTilemap != null)
+            overlayTilemap.SetTile(position, null);
+        if (targetTilemap != null && plowedTile != null)
             targetTilemap.SetTile(position, plowedTile);
 
         return true;
