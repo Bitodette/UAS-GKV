@@ -53,14 +53,14 @@ public class CropsManager : MonoBehaviour
             if (srcMap == null) continue;
 
             Vector3 worldPos = srcMap.GetCellCenterWorld(pos);
-            bool belowOrSame = worldPos.y <= playerY;
+            bool below = worldPos.y < playerY;
 
             TileBase tile = srcMap.GetTile(pos);
             if (tile == null)
                 tile = overlayTilemap != null ? overlayTilemap.GetTile(pos) : null;
             if (tile == null) continue;
 
-            if (belowOrSame)
+            if (below)
             {
                 if (overlayTilemap.GetTile(pos) != tile)
                 {
