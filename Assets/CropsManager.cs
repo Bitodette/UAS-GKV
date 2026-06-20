@@ -20,10 +20,10 @@ public class CropsManager : MonoBehaviour
     [SerializeField] private Tilemap wateredTilemap;
     [SerializeField] private Tilemap overlayTilemap;
     [SerializeField] private TileBase[] growthTiles;
+    [SerializeField] private Transform playerRef;
 
     private Dictionary<Vector3Int, Crops> crops;
     private TileBase plowedTile;
-    private Transform playerRef;
 
     private void Start()
     {
@@ -36,6 +36,11 @@ public class CropsManager : MonoBehaviour
 
         if (playerRef == null && GameManager.Instance != null && GameManager.Instance.player != null)
             playerRef = GameManager.Instance.player.transform;
+        if (playerRef == null)
+        {
+            GameObject playerGO = GameObject.FindGameObjectWithTag("Player");
+            if (playerGO != null) playerRef = playerGO.transform;
+        }
     }
 
     private void Update()
