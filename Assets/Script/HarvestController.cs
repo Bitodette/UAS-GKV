@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class HarvestController : MonoBehaviour
 {
-    [SerializeField] private GameObject wheatPrefab;
+    [SerializeField] private ItemData wheatItem;
     [SerializeField] private int minDrop = 1;
     [SerializeField] private int maxDrop = 3;
 
@@ -23,17 +23,10 @@ public class HarvestController : MonoBehaviour
         Vector3Int gridPos = tilemapReadController.GetMouseGridPosition();
         if (!cropsManager.IsFullyGrown(gridPos)) return;
 
-        Vector3 worldPos = tilemapReadController.GridToWorldCenter(gridPos);
-        worldPos.z = 0;
-
-        if (cropsManager.Harvest(gridPos) && wheatPrefab != null)
+        if (cropsManager.Harvest(gridPos) && wheatItem != null && GameManager.Instance != null)
         {
             int count = Random.Range(minDrop, maxDrop + 1);
-            for (int i = 0; i < count; i++)
-            {
-                Vector3 offset = new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
-                Instantiate(wheatPrefab, worldPos + offset, Quaternion.identity);
-            }
+            GameManager.Instance.AddItem(wheatItem, count);
         }
     }
 }

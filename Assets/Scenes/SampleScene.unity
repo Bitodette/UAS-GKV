@@ -1444,10 +1444,12 @@ MonoBehaviour:
   slotPrefab: {fileID: 6652222535282735781, guid: 34d7972839adbdb4ba805ffae86f589b, type: 3}
   selectedSlotSprite: {fileID: 3637030607187992235, guid: 39072982c9a85024e9db87a81e3736ee, type: 3}
   defaultItems:
-  - {fileID: 11400000, guid: c86d1f9a882dd744fb2062ca823171d7, type: 2}
-  - {fileID: 11400000, guid: 66b64ad6bc22a3c48a524be96f6285be, type: 2}
-  - {fileID: 11400000, guid: 80503a9381281a44abf6b57adcd6224b, type: 2}
-  - {fileID: 11400000, guid: 46d71bb10f131db46a48b191fd31740e, type: 2}
+  - item: {fileID: 11400000, guid: c86d1f9a882dd744fb2062ca823171d7, type: 2}
+    count: 1
+  - item: {fileID: 11400000, guid: 66b64ad6bc22a3c48a524be96f6285be, type: 2}
+    count: 1
+  - item: {fileID: 11400000, guid: 80503a9381281a44abf6b57adcd6224b, type: 2}
+    count: 1
   slotWidth: 70
   slotHeight: 70
   spacing: 6
@@ -3131,11 +3133,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   plowed: {fileID: 11400000, guid: 3b57d16e01dfce741ba6bac85c7adecb, type: 2}
   plowedSprite: {fileID: 209868373563013566, guid: f448e69b8dd0c3b4c8185a06e86d4c71, type: 3}
-  seeded: {fileID: 11400000, guid: 50ef9f8d2541c29449c23bd20cbbc45d, type: 2}
+  seeded: {fileID: 11400000, guid: eb73a79da47a82a41af9ef49537b7383, type: 2}
   watered: {fileID: 11400000, guid: 453340aebf7157e4aa7828d188360ad2, type: 2}
   targetTilemap: {fileID: 889043681}
   seedTilemap: {fileID: 24574350}
   wateredTilemap: {fileID: -10000002}
+  growthTiles:
+  - {fileID: 11400000, guid: eb73a79da47a82a41af9ef49537b7383, type: 2}
+  - {fileID: 11400000, guid: 50ef9f8d2541c29449c23bd20cbbc45d, type: 2}
+  - {fileID: 11400000, guid: 32c3279bc6ae53c419551d1135a13b57, type: 2}
+  - {fileID: 11400000, guid: 334d31b006f4ed645a6e922f2965462c, type: 2}
+  - {fileID: 11400000, guid: 71028c00399145d4c9df75bbfe4980fc, type: 2}
 --- !u!1839735485 &889043681
 Tilemap:
   m_ObjectHideFlags: 0
@@ -3825,6 +3833,52 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1369126130158245794, guid: 34d7972839adbdb4ba805ffae86f589b, type: 3}
   m_PrefabInstance: {fileID: 491958228}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1015321960
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1015321962}
+  - component: {fileID: 1015321961}
+  m_Layer: 0
+  m_Name: TimeManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1015321961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1015321960}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b88c6b0407cd7849954deac740c922e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cropsManager: {fileID: 889043680}
+  currentDay: 1
+--- !u!4 &1015321962
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1015321960}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.2140741, y: -4.0776806, z: -2.5490673}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &1047152499 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1369126130158245794, guid: 34d7972839adbdb4ba805ffae86f589b, type: 3}
@@ -30167,3 +30221,4 @@ SceneRoots:
   - {fileID: 213246178}
   - {fileID: 114700831}
   - {fileID: 1719134164}
+  - {fileID: 1015321962}
