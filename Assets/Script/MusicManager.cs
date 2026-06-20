@@ -8,10 +8,11 @@ public class MusicManager : MonoBehaviour
     [SerializeField] private int startingTrack = 0;
     [SerializeField] private bool playOnStart = true;
     [SerializeField] private bool loop = true;
-    [SerializeField] private float volume = 1f;
+    [SerializeField] [Range(0f, 1f)] private float maxVolume = 0.5f;
 
     private AudioSource audioSource;
     private int currentTrack = -1;
+    private float currentSliderValue = 1f;
 
     [RuntimeInitializeOnLoadMethod]
     private static void AutoInitialize()
@@ -46,19 +47,24 @@ public class MusicManager : MonoBehaviour
 
         audioSource.loop = loop;
 
-        volume = PlayerPrefs.GetFloat("MusicVolume", 1f);
-        audioSource.volume = volume;
+        currentSliderValue = PlayerPrefs.GetFloat("MusicVolume", 1f);
+        audioSource.volume = MapSliderToVolume(currentSliderValue);
 
         if (playOnStart && tracks != null && tracks.Length > 0)
             PlayTrack(startingTrack);
     }
 
-    public void SetVolume(float v)
+    private float MapSliderToVolume(float sliderValue)
     {
-        volume = v;
+        return Mathf.Clamp01(sliderValue) * Mathf.Clamp01(sliderValue) * maxVolume;
+    }
+
+    public void SetVolume(float sliderValue)
+    {
+        currentSliderValue = sliderValue;
         if (audioSource != null)
-            audioSource.volume = v;
-        PlayerPrefs.SetFloat("MusicVolume", v);
+            audioSource.volume = MapSliderToVolume(sliderValue);
+        PlayerPrefs.SetFloat("MusicVolume", sliderValue);
         PlayerPrefs.Save();
     }
 

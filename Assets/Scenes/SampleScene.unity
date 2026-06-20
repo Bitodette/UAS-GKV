@@ -2428,7 +2428,7 @@ MonoBehaviour:
   startingTrack: 0
   playOnStart: 1
   loop: 1
-  volume: 1
+  maxVolume: 0.5
 --- !u!4 &594821642
 Transform:
   m_ObjectHideFlags: 0
