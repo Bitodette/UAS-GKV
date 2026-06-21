@@ -92,10 +92,6 @@ public class PlayerController : MonoBehaviour
                 toolTimer -= Time.deltaTime;
                 if (toolTimer <= 0f)
                 {
-                    isUsingTool = false;
-                    toolFirstFrame = true;
-                    isWatering = false;
-                    isKapak = false;
                     if (pendingPlowPos.HasValue && cropsManager != null)
                     {
                         cropsManager.Plow(pendingPlowPos.Value);
@@ -106,11 +102,27 @@ public class PlayerController : MonoBehaviour
                         cropsManager.Water(pendingWaterPos.Value);
                         pendingWaterPos = null;
                     }
+
+                    bool hasExtended = false;
                     if (pendingTreeHit != null)
                     {
+                        float treeAnimDuration = 0f;
+                        if (pendingTreeHit is TreeCuttable tree)
+                            treeAnimDuration = tree.GetHitAnimDuration();
+                        toolTimer += treeAnimDuration;
+                        hasExtended = true;
                         pendingTreeHit.Hit();
                         pendingTreeHit = null;
                     }
+
+                    if (!hasExtended)
+                    {
+                        isUsingTool = false;
+                        toolFirstFrame = true;
+                        isWatering = false;
+                        isKapak = false;
+                    }
+
                     if (movement == Vector2.zero)
                         ChangeAnimationState("idle-" + lastDirection);
                 }
