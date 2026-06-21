@@ -225,22 +225,22 @@ public static class SaveManager
         }
 
         Debug.Log("[SaveManager] Tree data in save: " + (data.trees != null ? data.trees.Length + " trees" : "null"));
+
+        var existingTrees = Object.FindObjectsOfType<TreeCuttable>();
+        foreach (var t in existingTrees)
+        {
+            if (t.wholeTreeObject != null)
+            {
+                t.wholeTreeObject.SetActive(false);
+                Object.Destroy(t.wholeTreeObject);
+            }
+        }
+
         if (data.trees != null && data.trees.Length > 0)
         {
             var treeSpawner = Object.FindObjectOfType<TreeSpawner>();
-            Debug.Log("[SaveManager] TreeSpawner found: " + (treeSpawner != null) + ", template: " + (treeSpawner != null ? treeSpawner.treeTemplate : "null"));
             if (treeSpawner != null && treeSpawner.treeTemplate != null)
             {
-                var existingTrees = Object.FindObjectsOfType<TreeCuttable>();
-                foreach (var t in existingTrees)
-                {
-                    if (t.wholeTreeObject != null)
-                    {
-                        t.wholeTreeObject.SetActive(false);
-                        Object.Destroy(t.wholeTreeObject);
-                    }
-                }
-
                 foreach (var treeData in data.trees)
                 {
                     Vector3 pos = new Vector3(treeData.x, treeData.y, 0);
