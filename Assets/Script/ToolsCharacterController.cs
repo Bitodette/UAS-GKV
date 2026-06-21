@@ -48,15 +48,6 @@ public class ToolsCharacterController : MonoBehaviour
     {
         SelectTile();
         CanSelectCheck();
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            HotbarManager hotbar = FindFirstObjectByType<HotbarManager>();
-            bool isAxe = hotbar != null && hotbar.SelectedItem != null && hotbar.SelectedItem.itemName == "Kapak";
-
-            if (isAxe)
-                UseToolWorld();
-        }
     }
 
     private void SelectTile()

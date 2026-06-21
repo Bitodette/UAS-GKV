@@ -156,6 +156,7 @@ MonoBehaviour:
   maxDrop: 5
   wholeTreeObject: {fileID: 0}
   logSpawnPoint: {fileID: 7445932911175074096}
+  trunkCollider: {fileID: 3047746360681126707}
   hitAnimationSprites:
   - {fileID: 2661285048518318145, guid: 36938e5d7bca26342a4a8d2c616259f0, type: 3}
   - {fileID: -5254158675175630872, guid: 36938e5d7bca26342a4a8d2c616259f0, type: 3}
