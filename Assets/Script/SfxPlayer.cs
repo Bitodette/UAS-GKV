@@ -98,6 +98,7 @@ public class SfxPlayer : MonoBehaviour
     private void PlayEntry(SfxEntry entry)
     {
         if (entry.clip == null) return;
+        audioSource.volume = MusicManager.SFXVolume;
 
         if (entry.delay > 0f)
             StartCoroutine(PlayDelayed(entry));
@@ -108,6 +109,7 @@ public class SfxPlayer : MonoBehaviour
     private System.Collections.IEnumerator PlayDelayed(SfxEntry entry)
     {
         yield return new WaitForSeconds(entry.delay);
+        audioSource.volume = MusicManager.SFXVolume;
         audioSource.PlayOneShot(entry.clip);
     }
 }

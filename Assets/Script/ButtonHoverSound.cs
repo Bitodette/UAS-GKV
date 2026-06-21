@@ -23,12 +23,18 @@ public class ButtonHoverSound : MonoBehaviour, IPointerEnterHandler, IPointerCli
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (hoverClip != null && audioSource != null)
+        {
+            audioSource.volume = MusicManager.SFXVolume;
             audioSource.PlayOneShot(hoverClip);
+        }
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
         if (clickClip != null && audioSource != null)
+        {
+            audioSource.volume = MusicManager.SFXVolume;
             audioSource.PlayOneShot(clickClip);
+        }
     }
 }
