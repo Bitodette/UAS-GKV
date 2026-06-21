@@ -181,7 +181,7 @@ public class TilemapReadController : MonoBehaviour
     public bool IsMouseOverInRangeTile()
     {
         if (tilemap == null) return false;
-        if (!IsAnyToolSelected() && !IsSeedSelected()) return false;
+        if (!IsAnyToolSelected() && !IsSeedSelected() && !IsKapakSelected()) return false;
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         worldPos.z = 0;
         Vector3Int gridPos = tilemap.WorldToCell(worldPos);
@@ -193,7 +193,7 @@ public class TilemapReadController : MonoBehaviour
 
     public bool IsMouseOverPlayerTile()
     {
-        if (tilemap == null || (!IsAnyToolSelected() && !IsSeedSelected())) return false;
+        if (tilemap == null || (!IsAnyToolSelected() && !IsSeedSelected() && !IsKapakSelected())) return false;
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         worldPos.z = 0;
         Vector3Int gridPos = tilemap.WorldToCell(worldPos);
@@ -210,7 +210,7 @@ public class TilemapReadController : MonoBehaviour
 
     public bool IsMouseOverDiagonalTile()
     {
-        if (tilemap == null || (!IsAnyToolSelected() && !IsSeedSelected())) return false;
+        if (tilemap == null || (!IsAnyToolSelected() && !IsSeedSelected() && !IsKapakSelected())) return false;
         Vector3Int gridPos = GetMouseGridPosition();
         Vector3Int playerGrid = GetPlayerGridPosition();
         Vector3Int d = gridPos - playerGrid;
@@ -238,6 +238,11 @@ public class TilemapReadController : MonoBehaviour
     public bool IsWateringCanSelected()
     {
         return hotbar != null && hotbar.SelectedItem != null && hotbar.SelectedItem.itemName == "water can";
+    }
+
+    public bool IsKapakSelected()
+    {
+        return hotbar != null && hotbar.SelectedItem != null && hotbar.SelectedItem.itemName == "Kapak";
     }
 
     public bool IsSeedSelected()

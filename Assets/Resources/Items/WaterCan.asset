@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f8c2399f0bec02643919d02e368f560e, type: 3}
-  m_Name: water can
+  m_Name: WaterCan
   m_EditorClassIdentifier: 
   itemName: water can
   icon: {fileID: 6969704404471370761, guid: f6fef0d4bfbaf57458c3a71378bc1900, type: 3}

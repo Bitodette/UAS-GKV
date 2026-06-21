@@ -177,7 +177,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   treeHealth: 3
-  woodPrefabs: []
+  woodPrefabs:
+  - {fileID: 5197513698089741005, guid: e6c731a17e5c3f24bb6fe62bafeac3b0, type: 3}
   minDrop: 2
   maxDrop: 5
   wholeTreeObject: {fileID: 0}

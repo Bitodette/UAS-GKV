@@ -10,8 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f8c2399f0bec02643919d02e368f560e, type: 3}
-  m_Name: tools
+  m_Name: Kapak
   m_EditorClassIdentifier: 
-  itemName: tools
-  icon: {fileID: 7386783617407801484, guid: 57c50b38dc59112499da2fd648423307, type: 3}
-  isStackable: 0
+  itemName: Kapak
+  icon: {fileID: 3637259797823152800, guid: 7ffc7c5673a428a4a8a521600dd5d5b2, type: 3}
+  isStackable: 1
+  isSeed: 0

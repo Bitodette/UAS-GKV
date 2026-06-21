@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class TreeCuttable : MonoBehaviour
+public class TreeCuttable : ToolHit
 {
     [Header("Statistik Pohon")]
     public int treeHealth = 3;
@@ -23,17 +23,9 @@ public class TreeCuttable : MonoBehaviour
         treeHealth = Random.Range(minHealth, maxHealth + 1);
     }
 
-    void OnMouseDown()
+    public override void Hit()
     {
         if (isDestroyed) return;
-
-        GameObject player = GameManager.Instance.player;
-        if (player != null)
-        {
-            float distance = Vector2.Distance(transform.position, player.transform.position);
-            if (distance > 2f) return;
-        }
-
         TakeDamage();
     }
 
@@ -41,20 +33,9 @@ public class TreeCuttable : MonoBehaviour
     {
         treeHealth--;
 
-        wholeTreeObject.transform.localScale = new Vector3(1.1f, 1.1f, 1f);
-        Invoke("ResetScale", 0.08f);
-
         if (treeHealth <= 0)
         {
             DestroyTree();
-        }
-    }
-
-    void ResetScale()
-    {
-        if (wholeTreeObject != null)
-        {
-            wholeTreeObject.transform.localScale = Vector3.one;
         }
     }
 
@@ -66,6 +47,7 @@ public class TreeCuttable : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
+            if (woodPrefabs == null || woodPrefabs.Length == 0) break;
             Vector3 spawnOffset = new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
             GameObject prefab = woodPrefabs[Random.Range(0, woodPrefabs.Length)];
             Instantiate(prefab, transform.position + spawnOffset, Quaternion.identity);
