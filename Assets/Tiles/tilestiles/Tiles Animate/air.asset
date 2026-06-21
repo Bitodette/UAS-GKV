@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13b75c95f34a00d4e8c04f76b73312e6, type: 3}
+  m_Name: air
+  m_EditorClassIdentifier: 
+  m_AnimatedSprites:
+  - {fileID: -5485825476828781865, guid: 76655ded0c42c464ab50de9364902a94, type: 3}
+  - {fileID: -8901078248470398821, guid: 76655ded0c42c464ab50de9364902a94, type: 3}
+  - {fileID: 1195398634638422965, guid: 76655ded0c42c464ab50de9364902a94, type: 3}
+  - {fileID: -4898777042880970102, guid: 76655ded0c42c464ab50de9364902a94, type: 3}
+  - {fileID: -6887511560563657772, guid: 76655ded0c42c464ab50de9364902a94, type: 3}
+  - {fileID: -5085447910592374775, guid: 76655ded0c42c464ab50de9364902a94, type: 3}
+  - {fileID: -5206881552924851214, guid: 76655ded0c42c464ab50de9364902a94, type: 3}
+  - {fileID: -4677731046986469182, guid: 76655ded0c42c464ab50de9364902a94, type: 3}
+  - {fileID: 7635591854413854998, guid: 76655ded0c42c464ab50de9364902a94, type: 3}
+  m_MinSpeed: 5
+  m_MaxSpeed: 5
+  m_AnimationStartTime: 0
+  m_AnimationStartFrame: 0
+  m_TileColliderType: 0
+  m_TileAnimationFlags: 0

@@ -15,4 +15,9 @@ MonoBehaviour:
   tiles:
   - {fileID: 11400000, guid: 453340aebf7157e4aa7828d188360ad2, type: 2}
   - {fileID: 11400000, guid: 3b57d16e01dfce741ba6bac85c7adecb, type: 2}
+  - {fileID: 11400000, guid: 6be46ce3891b0d4419f9b2465700c882, type: 2}
+  - {fileID: 11400000, guid: 033ce93a8aed0064d95372b835b765e4, type: 2}
+  - {fileID: 11400000, guid: e91ed21069802104c8f2258d00cd64e8, type: 2}
+  - {fileID: 11400000, guid: c61bed2c1115f494497f5aa8d3008438, type: 2}
+  - {fileID: 11400000, guid: a6c84708ff4ca2c4caf86135d114d9b4, type: 2}
   plowable: 1
