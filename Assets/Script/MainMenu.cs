@@ -36,6 +36,15 @@ public class MainMenu : MonoBehaviour
             MusicManager.Instance.SetVolume(value);
     }
 
+    private void Update()
+    {
+        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.N))
+        {
+            SaveManager.DeleteSave();
+            Debug.Log("Save data deleted!");
+        }
+    }
+
     public void PlayGame()
     {
         SceneManager.LoadScene(1);

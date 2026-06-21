@@ -195,6 +195,8 @@ public class PlayerController : MonoBehaviour
                         ToolHit hit = col.GetComponentInParent<ToolHit>();
                         if (hit != null)
                         {
+                            if (hit is TreeCuttable tree && tree.trunkCollider != null && tree.trunkCollider != col)
+                                continue;
                             pendingTreeHit = hit;
                             break;
                         }

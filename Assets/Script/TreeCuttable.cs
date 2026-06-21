@@ -14,6 +14,7 @@ public class TreeCuttable : ToolHit
     [Header("Referensi")]
     public GameObject wholeTreeObject;
     public Transform logSpawnPoint;
+    public Collider2D trunkCollider;
 
     [Header("Hit Animation")]
     public Sprite[] hitAnimationSprites;

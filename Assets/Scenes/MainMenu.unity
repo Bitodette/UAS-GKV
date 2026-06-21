@@ -809,6 +809,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   optionPanel: {fileID: 126554630}
   masterVolumeSlider: {fileID: 1926915718}
+  hoverClip: {fileID: 0}
+  clickClip: {fileID: 0}
 --- !u!4 &1105417919
 Transform:
   m_ObjectHideFlags: 0
