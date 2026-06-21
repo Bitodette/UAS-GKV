@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[RequireComponent(typeof(SfxPlayer))]
 public class PlayerController : MonoBehaviour
 {
     [Header("Pengaturan Pergerakan")]
@@ -30,6 +31,9 @@ public class PlayerController : MonoBehaviour
     private Vector3Int? pendingPlowPos;
     private Vector3Int? pendingWaterPos;
 
+    [Header("SFX")]
+    [SerializeField] private SfxPlayer sfxPlayer;
+
     void Start()
     {
         anim = GetComponent<Animator>();
@@ -39,6 +43,9 @@ public class PlayerController : MonoBehaviour
         tilemapReadController = FindFirstObjectByType<TilemapReadController>();
         cropsManager = FindFirstObjectByType<CropsManager>();
         hotbar = FindFirstObjectByType<HotbarManager>();
+
+        if (sfxPlayer == null)
+            sfxPlayer = GetComponent<SfxPlayer>();
     }
 
     void Update()
@@ -64,6 +71,7 @@ public class PlayerController : MonoBehaviour
                 else { lastDirection = "depan"; ChangeAnimationState(isWatering ? "nyiram-depan" : "nyangkul-depan"); }
                 isUsingTool = true;
                 toolFirstFrame = true;
+                PlayToolSfx();
             }
             return;
         }
@@ -154,6 +162,7 @@ public class PlayerController : MonoBehaviour
                         lastDirection = "depan";
                         ChangeAnimationState(isWatering ? "nyiram-depan" : "nyangkul-depan");
                         isUsingTool = true;
+                        PlayToolSfx();
                     }
                     else if (delta.x != 0 && delta.y != 0)
                     {
@@ -305,6 +314,12 @@ public class PlayerController : MonoBehaviour
 
         ChangeAnimationState(animName);
         isUsingTool = true;
+        PlayToolSfx();
+    }
+
+    private void PlayToolSfx()
+    {
+        sfxPlayer.Play(currentAnimation);
     }
 
     void ChangeAnimationState(string newAnimation)

@@ -14,16 +14,6 @@ public class MusicManager : MonoBehaviour
     private int currentTrack = -1;
     private float currentSliderValue = 1f;
 
-    [RuntimeInitializeOnLoadMethod]
-    private static void AutoInitialize()
-    {
-        if (Instance == null)
-        {
-            GameObject go = new GameObject("MusicManager");
-            go.AddComponent<MusicManager>();
-        }
-    }
-
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -34,9 +24,6 @@ public class MusicManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
-        if (tracks == null || tracks.Length == 0)
-            tracks = Resources.LoadAll<AudioClip>("Musik");
     }
 
     private void Start()

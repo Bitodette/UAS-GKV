@@ -195,6 +195,11 @@ public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointe
             iconImage.enabled = true;
             countText.text = count > 1 ? count.ToString() : "";
             countText.gameObject.SetActive(true);
+
+            if (item.itemName == "Wheat" || item.itemName == "Wheat Seed")
+                iconImage.rectTransform.localScale = new Vector3(0.65f, 0.65f, 1f);
+            else
+                iconImage.rectTransform.localScale = Vector3.one;
         }
         else
         {

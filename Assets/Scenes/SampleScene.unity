@@ -54264,6 +54264,7 @@ GameObject:
   - component: {fileID: 2041105314}
   - component: {fileID: 2041105315}
   - component: {fileID: 2041105316}
+  - component: {fileID: 2041105317}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -54373,6 +54374,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 3
   movement: {x: 0, y: 0}
+  sfxPlayer: {fileID: 0}
 --- !u!50 &2041105313
 Rigidbody2D:
   serializedVersion: 4
@@ -54481,6 +54483,43 @@ MonoBehaviour:
   wheatItem: {fileID: 11400000, guid: 46d71bb10f131db46a48b191fd31740e, type: 2}
   minDrop: 1
   maxDrop: 3
+--- !u!114 &2041105317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2041105306}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11399b8bc1d7e0f4da2ed35d6ae194b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  entries:
+  - id: nyangkul-depan
+    clip: {fileID: 8300000, guid: c006f784ba7494a4fb614120ea6dc9e2, type: 3}
+    delay: 0.2
+  - id: nyangkul-depan
+    clip: {fileID: 8300000, guid: 261f02e551d01c64691977904ff15fec, type: 3}
+    delay: 0
+  - id: nyangkul-kanan
+    clip: {fileID: 8300000, guid: c006f784ba7494a4fb614120ea6dc9e2, type: 3}
+    delay: 0
+  - id: nyangkul-kanan
+    clip: {fileID: 8300000, guid: 261f02e551d01c64691977904ff15fec, type: 3}
+    delay: 0
+  - id: nyangkul-belakang
+    clip: {fileID: 8300000, guid: c006f784ba7494a4fb614120ea6dc9e2, type: 3}
+    delay: 0.2
+  - id: nyangkul-belakang
+    clip: {fileID: 8300000, guid: 261f02e551d01c64691977904ff15fec, type: 3}
+    delay: 0.1
+  - id: nyiram-depan
+    clip: {fileID: 8300000, guid: a88fb91e65239504f82df29e6639af60, type: 3}
+    delay: 0
+  - id: nyiram-kanan
+    clip: {fileID: 8300000, guid: a88fb91e65239504f82df29e6639af60, type: 3}
+    delay: 0
 --- !u!1 &2069734173
 GameObject:
   m_ObjectHideFlags: 0
