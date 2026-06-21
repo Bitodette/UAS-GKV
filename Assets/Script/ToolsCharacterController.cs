@@ -52,9 +52,9 @@ public class ToolsCharacterController : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             HotbarManager hotbar = FindFirstObjectByType<HotbarManager>();
-            bool hasAnyItem = hotbar != null && hotbar.SelectedItem != null;
+            bool isAxe = hotbar != null && hotbar.SelectedItem != null && hotbar.SelectedItem.itemName == "Kapak";
 
-            if (!hasAnyItem)
+            if (isAxe)
                 UseToolWorld();
         }
     }

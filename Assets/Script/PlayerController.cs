@@ -36,6 +36,9 @@ public class PlayerController : MonoBehaviour
     [Header("SFX")]
     [SerializeField] private SfxPlayer sfxPlayer;
 
+    private float lastWalkNormalizedTime = 0f;
+    private bool wasWalking = false;
+
     void Start()
     {
         anim = GetComponent<Animator>();
@@ -294,6 +297,7 @@ public class PlayerController : MonoBehaviour
             else if (lastDirection == "depan") ChangeAnimationState("idle-depan");
         }
 
+        DetectFootstep();
     }
 
     void FixedUpdate()
@@ -387,6 +391,35 @@ public class PlayerController : MonoBehaviour
     private void PlayToolSfx()
     {
         sfxPlayer.Play(currentAnimation);
+    }
+
+    private void DetectFootstep()
+    {
+        if (currentAnimation.StartsWith("jalan-"))
+        {
+            float currentNorm = anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
+            float norm = currentNorm - Mathf.Floor(currentNorm);
+
+            if (!wasWalking)
+            {
+                wasWalking = true;
+                lastWalkNormalizedTime = norm;
+                return;
+            }
+
+            // Wrap around (0.9→0.1) = one footstep
+            if (lastWalkNormalizedTime > 0.7f && norm < 0.3f)
+                sfxPlayer.PlaySequential(currentAnimation);
+            // Mid-cycle (~0.5) = other footstep
+            else if (lastWalkNormalizedTime < 0.4f && norm >= 0.4f)
+                sfxPlayer.PlaySequential(currentAnimation);
+
+            lastWalkNormalizedTime = norm;
+        }
+        else
+        {
+            wasWalking = false;
+        }
     }
 
     void ChangeAnimationState(string newAnimation)

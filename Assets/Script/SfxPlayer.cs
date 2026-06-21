@@ -14,6 +14,7 @@ public class SfxPlayer : MonoBehaviour
     [SerializeField] private SfxEntry[] entries;
 
     private AudioSource audioSource;
+    private int[] sequentialIndex;
 
     void Awake()
     {
@@ -52,6 +53,44 @@ public class SfxPlayer : MonoBehaviour
                     return;
                 }
                 pick--;
+            }
+        }
+    }
+
+    public void PlaySequential(string id)
+    {
+        if (entries == null || entries.Length == 0) return;
+
+        int first = -1;
+        int count = 0;
+        for (int i = 0; i < entries.Length; i++)
+        {
+            if (entries[i].id == id)
+            {
+                if (first < 0) first = i;
+                count++;
+            }
+        }
+
+        if (count == 0) return;
+
+        if (sequentialIndex == null) sequentialIndex = new int[0];
+        if (sequentialIndex.Length != entries.Length) sequentialIndex = new int[entries.Length];
+
+        int idx = sequentialIndex[first] % count;
+        sequentialIndex[first] = idx + 1;
+
+        int found = 0;
+        for (int i = 0; i < entries.Length; i++)
+        {
+            if (entries[i].id == id)
+            {
+                if (found == idx)
+                {
+                    PlayEntry(entries[i]);
+                    return;
+                }
+                found++;
             }
         }
     }

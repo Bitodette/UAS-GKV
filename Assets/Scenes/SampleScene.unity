@@ -66542,6 +66542,42 @@ MonoBehaviour:
   - id: ngapak-kanan
     clip: {fileID: 8300000, guid: c3645f1d8e8301e4b9e3e5b272f7b04f, type: 3}
     delay: 0.2
+  - id: jalan-kanan
+    clip: {fileID: 8300000, guid: 8e4e09bf5dbeabb468b761767edadb66, type: 3}
+    delay: 0
+  - id: jalan-kanan
+    clip: {fileID: 8300000, guid: 933f2f5f1127a4344a06289870665295, type: 3}
+    delay: 0
+  - id: jalan-kanan
+    clip: {fileID: 8300000, guid: 984855303cf045d469bf8a9c723a07f7, type: 3}
+    delay: 0
+  - id: jalan-kiri
+    clip: {fileID: 8300000, guid: 8e4e09bf5dbeabb468b761767edadb66, type: 3}
+    delay: 0
+  - id: jalan-kiri
+    clip: {fileID: 8300000, guid: 933f2f5f1127a4344a06289870665295, type: 3}
+    delay: 0
+  - id: jalan-kiri
+    clip: {fileID: 8300000, guid: 984855303cf045d469bf8a9c723a07f7, type: 3}
+    delay: 0
+  - id: jalan-atas
+    clip: {fileID: 8300000, guid: 8e4e09bf5dbeabb468b761767edadb66, type: 3}
+    delay: 0
+  - id: jalan-atas
+    clip: {fileID: 8300000, guid: 933f2f5f1127a4344a06289870665295, type: 3}
+    delay: 0
+  - id: jalan-atas
+    clip: {fileID: 8300000, guid: 984855303cf045d469bf8a9c723a07f7, type: 3}
+    delay: 0
+  - id: jalan-bawah
+    clip: {fileID: 8300000, guid: 8e4e09bf5dbeabb468b761767edadb66, type: 3}
+    delay: 0
+  - id: jalan-bawah
+    clip: {fileID: 8300000, guid: 933f2f5f1127a4344a06289870665295, type: 3}
+    delay: 0
+  - id: jalan-bawah
+    clip: {fileID: 8300000, guid: 984855303cf045d469bf8a9c723a07f7, type: 3}
+    delay: 0
 --- !u!1 &2069734173
 GameObject:
   m_ObjectHideFlags: 0
