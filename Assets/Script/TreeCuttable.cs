@@ -19,6 +19,7 @@ public class TreeCuttable : ToolHit
     public Sprite[] hitAnimationSprites;
     public float hitAnimSpeed = 0.08f;
 
+    public bool healthSetBySave = false;
     private bool isDestroyed = false;
     private bool isHitAnimating = false;
     private Coroutine hitAnimCoroutine;
@@ -30,7 +31,9 @@ public class TreeCuttable : ToolHit
             wholeTreeObject = transform.parent.gameObject;
 
         spriteRenderer = GetComponent<SpriteRenderer>();
-        treeHealth = Random.Range(minHealth, maxHealth + 1);
+
+        if (!healthSetBySave)
+            treeHealth = Random.Range(minHealth, maxHealth + 1);
     }
 
     public float GetHitAnimDuration()

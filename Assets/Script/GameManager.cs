@@ -12,6 +12,18 @@ public class GameManager : MonoBehaviour
         if (inventory == null) inventory = FindFirstObjectByType<InventoryManager>();
     }
 
+    private void Start()
+    {
+        if (SaveManager.HasSaveData())
+            StartCoroutine(DelayedLoad());
+    }
+
+    private IEnumerator DelayedLoad()
+    {
+        yield return null;
+        SaveManager.Load();
+    }
+
     public GameObject player;
     public HotbarManager hotbar;
     public InventoryManager inventory;

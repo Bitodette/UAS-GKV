@@ -120,6 +120,44 @@ public class CropsManager : MonoBehaviour
         return tile;
     }
 
+    public Dictionary<Vector3Int, Crops> CropsData => crops;
+
+    public void ClearAllCrops()
+    {
+        foreach (var pos in crops.Keys)
+        {
+            if (targetTilemap != null) targetTilemap.SetTile(pos, null);
+            if (seedTilemap != null) seedTilemap.SetTile(pos, null);
+            if (wateredTilemap != null) wateredTilemap.SetTile(pos, null);
+            if (overlayTilemap != null) overlayTilemap.SetTile(pos, null);
+        }
+        crops.Clear();
+    }
+
+    public void RestoreCrop(Vector3Int pos, Crops crop)
+    {
+        crops[pos] = crop;
+
+        if (plowedTile != null && targetTilemap != null)
+            targetTilemap.SetTile(pos, plowedTile);
+
+        if (crop.isWatered && watered != null && wateredTilemap != null)
+            wateredTilemap.SetTile(pos, watered);
+
+        if (crop.seeded)
+        {
+            if (crop.growthStage == 0)
+            {
+                if (seeded != null)
+                    SetCropTile(pos, seeded);
+            }
+            else if (growthTiles != null && crop.growthStage - 1 < growthTiles.Length)
+            {
+                SetCropTile(pos, growthTiles[crop.growthStage - 1]);
+            }
+        }
+    }
+
     public bool Check(Vector3Int position)
     {
         return crops.ContainsKey(position);

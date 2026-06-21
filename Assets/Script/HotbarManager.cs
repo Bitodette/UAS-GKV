@@ -45,6 +45,8 @@ public class HotbarManager : MonoBehaviour
     }
 
     public int SelectedIndex => selectedIndex;
+    public ItemData[] InventoryItems => inventoryItems;
+    public int[] ItemCounts => itemCounts;
 
     void Awake()
     {

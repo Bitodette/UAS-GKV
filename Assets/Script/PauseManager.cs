@@ -167,6 +167,7 @@ public class PauseManager : MonoBehaviour
 
     public void SaveAndQuit()
     {
+        SaveManager.Save();
         IsPaused = false;
         Time.timeScale = 1f;
         SceneManager.LoadScene(0);
