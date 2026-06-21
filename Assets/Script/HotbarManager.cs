@@ -127,7 +127,7 @@ public class HotbarManager : MonoBehaviour
 
     void Update()
     {
-        if (!Application.isPlaying) return;
+        if (!Application.isPlaying || PauseManager.IsPaused) return;
         HandleScrollInput();
         HandleNumberKeys();
     }

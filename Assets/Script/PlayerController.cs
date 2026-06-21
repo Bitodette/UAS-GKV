@@ -52,6 +52,8 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (PauseManager.IsPaused) return;
+
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
@@ -296,7 +298,7 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (isUsingTool || isWalkingToTarget) return;
+        if (isUsingTool || isWalkingToTarget || PauseManager.IsPaused) return;
         rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
     }
 

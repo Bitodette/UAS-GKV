@@ -50,6 +50,8 @@ public class InventoryManager : MonoBehaviour
 
     void Update()
     {
+        if (PauseManager.IsPaused) return;
+
         if (Input.GetKeyDown(KeyCode.Tab))
             ToggleInventory();
     }
@@ -137,6 +139,12 @@ public class InventoryManager : MonoBehaviour
         if (index < 0 || index >= inventorySlots.Length) return;
         inventoryItems[index] = item;
         itemCounts[index] = count;
+    }
+
+    public void CloseInventory()
+    {
+        if (inventoryPanel != null && inventoryPanel.activeSelf)
+            inventoryPanel.SetActive(false);
     }
 
     public void RefreshUI()
