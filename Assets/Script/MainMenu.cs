@@ -6,6 +6,7 @@ public class MainMenu : MonoBehaviour
 {
     [SerializeField] private GameObject optionPanel;
     [SerializeField] private Slider masterVolumeSlider;
+    [SerializeField] private Slider sfxVolumeSlider;
     [SerializeField] private AudioClip hoverClip;
     [SerializeField] private AudioClip clickClip;
 
@@ -28,12 +29,22 @@ public class MainMenu : MonoBehaviour
             masterVolumeSlider.value = PlayerPrefs.GetFloat("MusicVolume", 1f);
             masterVolumeSlider.onValueChanged.AddListener(OnMasterVolumeChanged);
         }
+        if (sfxVolumeSlider != null)
+        {
+            sfxVolumeSlider.value = MusicManager.SFXVolume;
+            sfxVolumeSlider.onValueChanged.AddListener(OnSFXVolumeChanged);
+        }
     }
 
     private void OnMasterVolumeChanged(float value)
     {
         if (MusicManager.Instance != null)
             MusicManager.Instance.SetVolume(value);
+    }
+
+    private void OnSFXVolumeChanged(float value)
+    {
+        MusicManager.SFXVolume = value;
     }
 
     private void Update()

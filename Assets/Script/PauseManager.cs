@@ -65,6 +65,7 @@ public class PauseManager : MonoBehaviour
         {
             WireButton(optionPanel.transform, "BackButton", CloseOptions);
             WireVolumeSlider(optionPanel.transform);
+            WireSFXVolumeSlider(optionPanel.transform);
         }
     }
 
@@ -114,6 +115,25 @@ public class PauseManager : MonoBehaviour
     {
         if (MusicManager.Instance != null)
             MusicManager.Instance.SetVolume(value);
+    }
+
+    private void WireSFXVolumeSlider(Transform root)
+    {
+        Transform t = FindDeepChild(root, "Slider SFX");
+        if (t != null)
+        {
+            Slider sl = t.GetComponent<Slider>();
+            if (sl != null)
+            {
+                sl.value = MusicManager.SFXVolume;
+                sl.onValueChanged.AddListener(OnSFXVolumeChanged);
+            }
+        }
+    }
+
+    private void OnSFXVolumeChanged(float value)
+    {
+        MusicManager.SFXVolume = value;
     }
 
     private static Transform FindDeepChild(Transform parent, string name)
