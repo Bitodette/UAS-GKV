@@ -9,6 +9,8 @@ public class PauseManager : MonoBehaviour
 
     [SerializeField] private GameObject pausePanel;
     [SerializeField] private GameObject optionPanel;
+    [SerializeField] private AudioClip hoverClip;
+    [SerializeField] private AudioClip clickClip;
 
     private void Awake()
     {
@@ -73,8 +75,25 @@ public class PauseManager : MonoBehaviour
         {
             Button btn = t.GetComponent<Button>();
             if (btn != null)
+            {
                 btn.onClick.AddListener(action);
+                AddHoverSound(btn.gameObject);
+            }
         }
+    }
+
+    private void AddHoverSound(GameObject go)
+    {
+        if (hoverClip == null)
+            hoverClip = Resources.Load<AudioClip>("Audio/hover");
+        if (clickClip == null)
+            clickClip = Resources.Load<AudioClip>("Audio/click");
+
+        var hs = go.GetComponent<ButtonHoverSound>();
+        if (hs == null)
+            hs = go.AddComponent<ButtonHoverSound>();
+        if (hoverClip != null) hs.hoverClip = hoverClip;
+        if (clickClip != null) hs.clickClip = clickClip;
     }
 
     private void WireVolumeSlider(Transform root)

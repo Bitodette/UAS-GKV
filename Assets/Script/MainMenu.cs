@@ -6,6 +6,20 @@ public class MainMenu : MonoBehaviour
 {
     [SerializeField] private GameObject optionPanel;
     [SerializeField] private Slider masterVolumeSlider;
+    [SerializeField] private AudioClip hoverClip;
+    [SerializeField] private AudioClip clickClip;
+
+    private void Awake()
+    {
+        if (hoverClip == null)
+            hoverClip = Resources.Load<AudioClip>("Audio/hover");
+        if (clickClip == null)
+            clickClip = Resources.Load<AudioClip>("Audio/click");
+
+        var allButtons = FindObjectsByType<Button>(FindObjectsSortMode.None);
+        foreach (var btn in allButtons)
+            AddButtonSound(btn.gameObject);
+    }
 
     private void Start()
     {
@@ -42,5 +56,14 @@ public class MainMenu : MonoBehaviour
     public void QuitGame()
     {
         Application.Quit();
+    }
+
+    private void AddButtonSound(GameObject go)
+    {
+        var hs = go.GetComponent<ButtonHoverSound>();
+        if (hs == null)
+            hs = go.AddComponent<ButtonHoverSound>();
+        if (hoverClip != null) hs.hoverClip = hoverClip;
+        if (clickClip != null) hs.clickClip = clickClip;
     }
 }
