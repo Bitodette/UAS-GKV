@@ -55353,7 +55353,7 @@ MonoBehaviour:
   - id: nyiram-kanan
     clip: {fileID: 8300000, guid: a88fb91e65239504f82df29e6639af60, type: 3}
     delay: 0
-  - id: nyiram-kanan
+  - id: nyiram-depan
     clip: {fileID: 8300000, guid: a88fb91e65239504f82df29e6639af60, type: 3}
     delay: 0
   - id: ngapak-depan
