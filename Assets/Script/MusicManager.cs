@@ -24,6 +24,8 @@ public class MusicManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        sfxVolume = PlayerPrefs.GetFloat("SFXVolume", 1f);
     }
 
     private static float sfxVolume = 1f;
@@ -49,8 +51,6 @@ public class MusicManager : MonoBehaviour
 
         currentSliderValue = PlayerPrefs.GetFloat("MusicVolume", 1f);
         audioSource.volume = MapSliderToVolume(currentSliderValue);
-
-        sfxVolume = PlayerPrefs.GetFloat("SFXVolume", 1f);
 
         if (playOnStart && tracks != null && tracks.Length > 0)
             PlayTrack(startingTrack);

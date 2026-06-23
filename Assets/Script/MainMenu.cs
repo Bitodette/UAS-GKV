@@ -24,16 +24,49 @@ public class MainMenu : MonoBehaviour
 
     private void Start()
     {
+        AutoWireSliders();
+    }
+
+    private void AutoWireSliders()
+    {
+        if (optionPanel == null) return;
+        Transform panel = optionPanel.transform;
+
+        // Master volume slider
+        if (masterVolumeSlider == null)
+        {
+            Transform t = FindDeepChild(panel, "Slider master volume");
+            if (t != null) masterVolumeSlider = t.GetComponent<Slider>();
+        }
         if (masterVolumeSlider != null)
         {
             masterVolumeSlider.value = PlayerPrefs.GetFloat("MusicVolume", 1f);
             masterVolumeSlider.onValueChanged.AddListener(OnMasterVolumeChanged);
         }
+
+        // SFX volume slider
+        if (sfxVolumeSlider == null)
+        {
+            Transform t = FindDeepChild(panel, "Slider SFX");
+            if (t != null) sfxVolumeSlider = t.GetComponent<Slider>();
+        }
         if (sfxVolumeSlider != null)
         {
-            sfxVolumeSlider.value = MusicManager.SFXVolume;
+            sfxVolumeSlider.value = PlayerPrefs.GetFloat("SFXVolume", 1f);
             sfxVolumeSlider.onValueChanged.AddListener(OnSFXVolumeChanged);
+            MusicManager.SFXVolume = sfxVolumeSlider.value;
         }
+    }
+
+    private static Transform FindDeepChild(Transform parent, string name)
+    {
+        foreach (Transform child in parent)
+        {
+            if (child.name == name) return child;
+            Transform result = FindDeepChild(child, name);
+            if (result != null) return result;
+        }
+        return null;
     }
 
     private void OnMasterVolumeChanged(float value)

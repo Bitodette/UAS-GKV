@@ -147,42 +147,99 @@ public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointe
         bool targetIsHotbar = !isInventorySlot;
 
         if (sourceIsHotbar && targetIsHotbar)
-        {
-            hotbar.SwapSlot(fromIndex, toIndex);
-            hotbar.RefreshUI();
-        }
+            StackOrSwapHotbar(hotbar, fromIndex, toIndex);
         else if (!sourceIsHotbar && !targetIsHotbar)
-        {
-            inventory.SwapSlot(fromIndex, toIndex);
-            inventory.RefreshUI();
-        }
+            StackOrSwapInventory(inventory, fromIndex, toIndex);
         else if (sourceIsHotbar && !targetIsHotbar)
+            StackOrSwapCross(hotbar, inventory, fromIndex, toIndex, true);
+        else
+            StackOrSwapCross(hotbar, inventory, toIndex, fromIndex, false);
+    }
+
+    private void StackOrSwapHotbar(HotbarManager hotbar, int fromIndex, int toIndex)
+    {
+        ItemData sourceItem = hotbar.GetItem(fromIndex);
+        int sourceCount = hotbar.GetItemCount(fromIndex);
+        ItemData targetItem = hotbar.GetItem(toIndex);
+        int targetCount = hotbar.GetItemCount(toIndex);
+
+        if (CanStack(sourceItem, targetItem))
         {
-            ItemData sourceItem = hotbar.GetItem(fromIndex);
-            int sourceCount = hotbar.GetItemCount(fromIndex);
-            ItemData targetItem = inventory.InventoryItems[toIndex];
-            int targetCount = inventory.ItemCounts[toIndex];
-
-            hotbar.SetItem(fromIndex, targetItem, targetCount);
-            inventory.SetItem(toIndex, sourceItem, sourceCount);
-
+            hotbar.SetItem(toIndex, targetItem, targetCount + sourceCount);
+            hotbar.SetItem(fromIndex, null, 0);
             hotbar.RefreshUI();
-            inventory.RefreshUI();
-        }
-        else if (!sourceIsHotbar && targetIsHotbar)
-        {
-            ItemData sourceItem = inventory.InventoryItems[fromIndex];
-            int sourceCount = inventory.ItemCounts[fromIndex];
-            ItemData targetItem = hotbar.GetItem(toIndex);
-            int targetCount = hotbar.GetItemCount(toIndex);
-
-            inventory.SetItem(fromIndex, targetItem, targetCount);
-            hotbar.SetItem(toIndex, sourceItem, sourceCount);
-
-            hotbar.RefreshUI();
-            inventory.RefreshUI();
+            return;
         }
 
+        hotbar.SwapSlot(fromIndex, toIndex);
+        hotbar.RefreshUI();
+    }
+
+    private void StackOrSwapInventory(InventoryManager inventory, int fromIndex, int toIndex)
+    {
+        ItemData sourceItem = inventory.InventoryItems[fromIndex];
+        int sourceCount = inventory.ItemCounts[fromIndex];
+        ItemData targetItem = inventory.InventoryItems[toIndex];
+        int targetCount = inventory.ItemCounts[toIndex];
+
+        if (CanStack(sourceItem, targetItem))
+        {
+            inventory.SetItem(toIndex, targetItem, targetCount + sourceCount);
+            inventory.SetItem(fromIndex, null, 0);
+            inventory.RefreshUI();
+            return;
+        }
+
+        inventory.SwapSlot(fromIndex, toIndex);
+        inventory.RefreshUI();
+    }
+
+    private void StackOrSwapCross(HotbarManager hotbar, InventoryManager inventory,
+                                   int hotbarIndex, int inventoryIndex, bool isHotbarSource)
+    {
+        ItemData hotbarItem = hotbar.GetItem(hotbarIndex);
+        int hotbarCount = hotbar.GetItemCount(hotbarIndex);
+        ItemData inventoryItem = inventory.InventoryItems[inventoryIndex];
+        int inventoryCount = inventory.ItemCounts[inventoryIndex];
+
+        if (isHotbarSource)
+        {
+            if (CanStack(hotbarItem, inventoryItem))
+            {
+                hotbar.SetItem(hotbarIndex, null, 0);
+                inventory.SetItem(inventoryIndex, inventoryItem, inventoryCount + hotbarCount);
+                hotbar.RefreshUI();
+                inventory.RefreshUI();
+                return;
+            }
+
+            hotbar.SetItem(hotbarIndex, inventoryItem, inventoryCount);
+            inventory.SetItem(inventoryIndex, hotbarItem, hotbarCount);
+        }
+        else
+        {
+            if (CanStack(inventoryItem, hotbarItem))
+            {
+                inventory.SetItem(inventoryIndex, null, 0);
+                hotbar.SetItem(hotbarIndex, hotbarItem, hotbarCount + inventoryCount);
+                hotbar.RefreshUI();
+                inventory.RefreshUI();
+                return;
+            }
+
+            hotbar.SetItem(hotbarIndex, inventoryItem, inventoryCount);
+            inventory.SetItem(inventoryIndex, hotbarItem, hotbarCount);
+        }
+
+        hotbar.RefreshUI();
+        inventory.RefreshUI();
+    }
+
+    private bool CanStack(ItemData a, ItemData b)
+    {
+        if (a == null || b == null) return false;
+        if (a != b) return false;
+        return a.isStackable;
     }
 
     public void UpdateSlot(ItemData item, int count)

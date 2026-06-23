@@ -28,6 +28,14 @@ public static class SaveManager
     }
 
     [System.Serializable]
+    public class TreeSaveData
+    {
+        public float x, y;
+        public int health;
+        public float scale;
+    }
+
+    [System.Serializable]
     public class PlayerPositionData
     {
         public float x, y, z;
@@ -47,14 +55,6 @@ public static class SaveManager
         public bool isWatered;
         public bool seeded;
         public int growthStage;
-    }
-
-    [System.Serializable]
-    public class TreeSaveData
-    {
-        public float x, y;
-        public int health;
-        public float scale;
     }
 
     public static void Save()
@@ -115,7 +115,6 @@ public static class SaveManager
         }
 
         var treeCuttables = Object.FindObjectsOfType<TreeCuttable>();
-        Debug.Log("[SaveManager] Found " + treeCuttables.Length + " trees to save");
         if (treeCuttables.Length > 0)
         {
             var treeList = new List<TreeSaveData>();
@@ -224,44 +223,16 @@ public static class SaveManager
             }
         }
 
-        Debug.Log("[SaveManager] Tree data in save: " + (data.trees != null ? data.trees.Length + " trees" : "null"));
-
-        var existingTrees = Object.FindObjectsOfType<TreeCuttable>();
-        foreach (var t in existingTrees)
-        {
-            if (t.wholeTreeObject != null)
-            {
-                t.wholeTreeObject.SetActive(false);
-                Object.Destroy(t.wholeTreeObject);
-            }
-        }
-
         if (data.trees != null && data.trees.Length > 0)
         {
             var treeSpawner = Object.FindObjectOfType<TreeSpawner>();
-            if (treeSpawner != null && treeSpawner.treeTemplate != null)
+            if (treeSpawner != null)
             {
-                foreach (var treeData in data.trees)
-                {
-                    Vector3 pos = new Vector3(treeData.x, treeData.y, 0);
-                    GameObject newTree = Object.Instantiate(treeSpawner.treeTemplate, pos, Quaternion.identity);
-                    newTree.transform.localScale = new Vector3(treeData.scale, treeData.scale, 1);
-
-                    var cuttables = newTree.GetComponentsInChildren<TreeCuttable>(true);
-                    foreach (var c in cuttables)
-                    {
-                        c.healthSetBySave = true;
-                        c.treeHealth = treeData.health;
-                        if (treeSpawner.dropPrefabs != null && treeSpawner.dropPrefabs.Length > 0)
-                            c.woodPrefabs = treeSpawner.dropPrefabs;
-                        c.minDrop = 2;
-                        c.maxDrop = 5;
-                        c.minHealth = 2;
-                        c.maxHealth = 5;
-                    }
-
-                    newTree.SetActive(true);
-                }
+                treeSpawner.RestoreFromSave(data.trees);
+            }
+            else
+            {
+                Debug.LogWarning("[SaveManager] TreeSpawner not found — skipping tree restore");
             }
         }
 

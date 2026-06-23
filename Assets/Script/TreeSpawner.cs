@@ -45,6 +45,49 @@ public class TreeSpawner : MonoBehaviour
         }
     }
 
+    public void RestoreFromSave(SaveManager.TreeSaveData[] savedTrees)
+    {
+        if (treeTemplate == null) return;
+
+        // Destroy all existing trees
+        var existingTrees = FindObjectsOfType<TreeCuttable>();
+        foreach (var t in existingTrees)
+        {
+            if (t.wholeTreeObject != null)
+            {
+                t.wholeTreeObject.SetActive(false);
+                Destroy(t.wholeTreeObject);
+            }
+            else
+            {
+                Destroy(t.gameObject);
+            }
+        }
+
+        // Restore from saved data
+        foreach (var treeData in savedTrees)
+        {
+            Vector3 pos = new Vector3(treeData.x, treeData.y, 0);
+            GameObject newTree = Instantiate(treeTemplate, pos, Quaternion.identity);
+            newTree.transform.localScale = new Vector3(treeData.scale, treeData.scale, 1);
+
+            var cuttables = newTree.GetComponentsInChildren<TreeCuttable>(true);
+            foreach (var c in cuttables)
+            {
+                c.healthSetBySave = true;
+                c.treeHealth = treeData.health;
+                if (dropPrefabs != null && dropPrefabs.Length > 0)
+                    c.woodPrefabs = dropPrefabs;
+                c.minDrop = 2;
+                c.maxDrop = 5;
+                c.minHealth = 2;
+                c.maxHealth = 5;
+            }
+
+            newTree.SetActive(true);
+        }
+    }
+
     Vector3? GetRandomPosition()
     {
         for (int attempt = 0; attempt < 30; attempt++)

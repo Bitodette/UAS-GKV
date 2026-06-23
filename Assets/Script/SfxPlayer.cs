@@ -18,10 +18,9 @@ public class SfxPlayer : MonoBehaviour
 
     void Awake()
     {
-        audioSource = GetComponent<AudioSource>();
-        if (audioSource == null)
-            audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource = gameObject.AddComponent<AudioSource>();
         audioSource.playOnAwake = false;
+        audioSource.enabled = true;
     }
 
     public void Play()
@@ -98,6 +97,14 @@ public class SfxPlayer : MonoBehaviour
     private void PlayEntry(SfxEntry entry)
     {
         if (entry.clip == null) return;
+        if (MusicManager.SFXVolume <= 0.0001f)
+        {
+            audioSource.enabled = false;
+            audioSource.mute = true;
+            return;
+        }
+        audioSource.enabled = true;
+        audioSource.mute = false;
         audioSource.volume = MusicManager.SFXVolume;
 
         if (entry.delay > 0f)
@@ -109,6 +116,14 @@ public class SfxPlayer : MonoBehaviour
     private System.Collections.IEnumerator PlayDelayed(SfxEntry entry)
     {
         yield return new WaitForSeconds(entry.delay);
+        if (MusicManager.SFXVolume <= 0.0001f)
+        {
+            audioSource.enabled = false;
+            audioSource.mute = true;
+            yield break;
+        }
+        audioSource.enabled = true;
+        audioSource.mute = false;
         audioSource.volume = MusicManager.SFXVolume;
         audioSource.PlayOneShot(entry.clip);
     }

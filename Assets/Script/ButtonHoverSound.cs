@@ -12,29 +12,38 @@ public class ButtonHoverSound : MonoBehaviour, IPointerEnterHandler, IPointerCli
 
     void Awake()
     {
-        audioSource = GetComponent<AudioSource>();
-        if (audioSource == null)
-        {
-            audioSource = gameObject.AddComponent<AudioSource>();
-            audioSource.playOnAwake = false;
-        }
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+        audioSource.enabled = true;
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (hoverClip != null && audioSource != null)
+        if (hoverClip == null || audioSource == null) return;
+        if (MusicManager.SFXVolume <= 0.0001f)
         {
-            audioSource.volume = MusicManager.SFXVolume;
-            audioSource.PlayOneShot(hoverClip);
+            audioSource.enabled = false;
+            audioSource.mute = true;
+            return;
         }
+        audioSource.enabled = true;
+        audioSource.mute = false;
+        audioSource.volume = MusicManager.SFXVolume;
+        audioSource.PlayOneShot(hoverClip);
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (clickClip != null && audioSource != null)
+        if (clickClip == null || audioSource == null) return;
+        if (MusicManager.SFXVolume <= 0.0001f)
         {
-            audioSource.volume = MusicManager.SFXVolume;
-            audioSource.PlayOneShot(clickClip);
+            audioSource.enabled = false;
+            audioSource.mute = true;
+            return;
         }
+        audioSource.enabled = true;
+        audioSource.mute = false;
+        audioSource.volume = MusicManager.SFXVolume;
+        audioSource.PlayOneShot(clickClip);
     }
 }
