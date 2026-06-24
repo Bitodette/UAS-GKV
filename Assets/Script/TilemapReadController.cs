@@ -12,13 +12,13 @@ public class TilemapReadController : MonoBehaviour
     [SerializeField] private List<TileData> tileDatas;
     [SerializeField] private TileData plowableData;
     [SerializeField] private TileData nonPlowableData;
-    [SerializeField] private int useRange = 1;
+    [SerializeField] private int useRange = 1;                     // range interaksi dari player (dalam tile)
     [SerializeField] private float playerCenterOffset = 0.75f;
 
     [SerializeField] private CropsManager cropsManager;
 
-    private Dictionary<TileBase, TileData> dataFromTiles;
-    private SpriteRenderer highlightSprite;
+    private Dictionary<TileBase, TileData> dataFromTiles;          // lookup cepat: tile → properti
+    private SpriteRenderer highlightSprite;                        // border kuning di tile yg di-hover
     private Vector3Int lastHighlightPos;
     private bool isHighlighted = false;
     private HotbarManager hotbar;
@@ -70,15 +70,16 @@ public class TilemapReadController : MonoBehaviour
                     dataFromTiles.Add(tile, nonPlowableData);
         }
 
-        GameObject hlObj = new GameObject("TileHighlight");
+        GameObject hlObj = new GameObject("TileHighlight");        // bikin object highlight
         hlObj.transform.SetParent(transform);
         highlightSprite = hlObj.AddComponent<SpriteRenderer>();
         highlightSprite.sortingOrder = 10;
-        highlightSprite.color = new Color(1, 1, 0, 0.5f);
+        highlightSprite.color = new Color(1, 1, 0, 0.5f);          // kuning transparan
         highlightSprite.sprite = CreateBorderSprite();
         highlightSprite.gameObject.SetActive(false);
     }
 
+    // bikin sprite border kotak secara procedural pake Texture2D
     private Sprite CreateBorderSprite()
     {
         int size = 32;
@@ -106,7 +107,7 @@ public class TilemapReadController : MonoBehaviour
 
         bool toolSelected = IsAnyToolSelected();
         bool seedSelected = IsSeedSelected();
-        if (!toolSelected && !seedSelected)
+        if (!toolSelected && !seedSelected)      // highlight cuma kalo pake tool/seed
         {
             if (isHighlighted)
             {
@@ -118,7 +119,7 @@ public class TilemapReadController : MonoBehaviour
 
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         worldPos.z = 0;
-        Vector3Int gridPos = tilemap.WorldToCell(worldPos);
+        Vector3Int gridPos = tilemap.WorldToCell(worldPos);        // posisi mouse di grid
 
         Vector3Int playerGrid = GetPlayerGridPosition();
         int dx = Mathf.Abs(gridPos.x - playerGrid.x);
@@ -126,14 +127,9 @@ public class TilemapReadController : MonoBehaviour
         bool inRange = dx <= useRange && dy <= useRange && hlMap.GetTile(gridPos) != null;
 
         if (seedSelected && !(cropsManager != null && cropsManager.Check(gridPos)))
-            inRange = false;
+            inRange = false;                                       // seed cuma bisa di tile yg udah di-cangkul
 
-        if (!IsPointerOverUI() && Input.GetMouseButtonDown(0))
-        {
-            Debug.Log($"Klik grid=({gridPos.x},{gridPos.y}) playerGrid=({playerGrid.x},{playerGrid.y}) dx={dx} dy={dy} range={useRange} adaTile={hlMap.GetTile(gridPos) != null} inRange={inRange}");
-        }
-
-        if (isHighlighted && gridPos == lastHighlightPos && inRange) return;
+        if (isHighlighted && gridPos == lastHighlightPos && inRange) return; // gak berubah, skip
 
         if (isHighlighted)
         {
@@ -141,7 +137,7 @@ public class TilemapReadController : MonoBehaviour
             isHighlighted = false;
         }
 
-        if (inRange)
+        if (inRange)                                                // tampilkan highlight di tile ini
         {
             Vector3 tileCenter = hlMap.GetCellCenterWorld(gridPos);
             highlightSprite.transform.position = tileCenter;
@@ -153,15 +149,13 @@ public class TilemapReadController : MonoBehaviour
 
     private bool IsPointerOverUI()
     {
-        return EventSystem.current != null &&
-               EventSystem.current.IsPointerOverGameObject();
+        return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
     }
 
     private Vector2 GetPlayerPosition()
     {
         if (GameManager.Instance != null && GameManager.Instance.player != null)
             return (Vector2)GameManager.Instance.player.transform.position + Vector2.up * playerCenterOffset;
-
         return Vector2.zero;
     }
 
@@ -217,6 +211,7 @@ public class TilemapReadController : MonoBehaviour
         return d.x != 0 && d.y != 0 && Mathf.Abs(d.x) <= useRange && Mathf.Abs(d.y) <= useRange && tilemap.GetTile(gridPos) != null;
     }
 
+    // konversi grid position ke world position di kaki player (bukan tengah tile)
     public Vector3 GridToWorldFeet(Vector3Int gridPos)
     {
         Vector3 center = tilemap.GetCellCenterWorld(gridPos);
@@ -259,16 +254,16 @@ public class TilemapReadController : MonoBehaviour
     public bool CanPlowAt(Vector3Int gridPos)
     {
         if (tilemap == null || cropsManager == null) return false;
-        if (cropsManager.Check(gridPos)) return false;
+        if (cropsManager.Check(gridPos)) return false;              // udah di-cangkul
         TileData tileData = GetTileData(tilemap.GetTile(gridPos));
-        return tileData == null || tileData.plowable;
+        return tileData == null || tileData.plowable;                // tile bisa di-cangkul
     }
 
     public bool CanWaterAt(Vector3Int gridPos)
     {
         if (tilemap == null || cropsManager == null) return false;
-        if (!cropsManager.Check(gridPos)) return false;
-        return !cropsManager.IsWatered(gridPos);
+        if (!cropsManager.Check(gridPos)) return false;             // harus udah di-cangkul
+        return !cropsManager.IsWatered(gridPos);                    // jangan siram 2x
     }
 
     public bool CanSeedAt(Vector3Int gridPos)

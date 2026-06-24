@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance;
+    public static GameManager Instance;              // singleton biar diakses script lain
     private void Awake()
     {
         Instance = this;
@@ -15,12 +15,12 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         if (SaveManager.HasSaveData())
-            StartCoroutine(DelayedLoad());
+            StartCoroutine(DelayedLoad());           // load data kalo ada save
     }
 
     private IEnumerator DelayedLoad()
     {
-        yield return null;
+        yield return null;                           // tunggu 1 frame biar semua manager siap
         SaveManager.Load();
     }
 
@@ -30,9 +30,9 @@ public class GameManager : MonoBehaviour
 
     public bool AddItem(ItemData item, int count = 1)
     {
-        bool added = hotbar != null && hotbar.AddItem(item, count);
+        bool added = hotbar != null && hotbar.AddItem(item, count);      // masukin ke hotbar dulu
         if (!added)
-            added = inventory != null && inventory.AddItem(item, count);
+            added = inventory != null && inventory.AddItem(item, count); // kalo penuh, masukin inventory
         return added;
     }
 }

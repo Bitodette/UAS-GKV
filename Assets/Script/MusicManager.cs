@@ -18,19 +18,19 @@ public class MusicManager : MonoBehaviour
     {
         if (Instance != null && Instance != this)
         {
-            Destroy(gameObject);
+            Destroy(gameObject);                             // singleton — cegah duplicate
             return;
         }
 
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+        DontDestroyOnLoad(gameObject);                       // musik lanjut antar scene
 
-        sfxVolume = PlayerPrefs.GetFloat("SFXVolume", 1f);
+        sfxVolume = PlayerPrefs.GetFloat("SFXVolume", 1f);   // load volume sfx
     }
 
     private static float sfxVolume = 1f;
 
-    public static float SFXVolume
+    public static float SFXVolume                            // volume SFX global (static)
     {
         get => sfxVolume;
         set
@@ -56,6 +56,7 @@ public class MusicManager : MonoBehaviour
             PlayTrack(startingTrack);
     }
 
+    // mapping slider (linear) ke volume (quadratic) biar lebih natural di telinga
     private float MapSliderToVolume(float sliderValue)
     {
         return Mathf.Clamp01(sliderValue) * Mathf.Clamp01(sliderValue) * maxVolume;
@@ -94,20 +95,9 @@ public class MusicManager : MonoBehaviour
         PlayTrack(prev);
     }
 
-    public void Stop()
-    {
-        audioSource.Stop();
-    }
-
-    public void Pause()
-    {
-        audioSource.Pause();
-    }
-
-    public void Resume()
-    {
-        audioSource.UnPause();
-    }
+    public void Stop() { audioSource.Stop(); }
+    public void Pause() { audioSource.Pause(); }
+    public void Resume() { audioSource.UnPause(); }
 
     public int CurrentTrackIndex => currentTrack;
     public string CurrentTrackName => tracks != null && currentTrack >= 0 && currentTrack < tracks.Length ? tracks[currentTrack].name : "";

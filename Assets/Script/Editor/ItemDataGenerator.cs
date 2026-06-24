@@ -3,6 +3,7 @@ using UnityEditor;
 using System.IO;
 using System.Linq;
 
+// Editor Window — generate ItemData (ScriptableObject) dari sprite sheet Aseprite
 public class ItemDataGenerator : EditorWindow
 {
     private Object sourceFile;
@@ -47,7 +48,7 @@ public class ItemDataGenerator : EditorWindow
             return;
         }
 
-        // Load all sprites from the source
+        // load semua sprite dari file source (harus Sprite Mode = Multiple)
         Sprite[] sprites = AssetDatabase.LoadAllAssetsAtPath(sourcePath)
             .Where(obj => obj is Sprite)
             .Cast<Sprite>()

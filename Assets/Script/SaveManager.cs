@@ -17,7 +17,7 @@ public static class SaveManager
     };
 
     [System.Serializable]
-    public class SaveData
+    public class SaveData                              // struktur data save file
     {
         public PlayerPositionData player;
         public int currentDay = 1;
@@ -104,8 +104,7 @@ public static class SaveManager
             {
                 cropList.Add(new CropData
                 {
-                    x = kvp.Key.x,
-                    y = kvp.Key.y,
+                    x = kvp.Key.x, y = kvp.Key.y,
                     isWatered = kvp.Value.isWatered,
                     seeded = kvp.Value.seeded,
                     growthStage = kvp.Value.growthStage
@@ -123,8 +122,7 @@ public static class SaveManager
                 Vector3 pos = tree.transform.position;
                 treeList.Add(new TreeSaveData
                 {
-                    x = pos.x,
-                    y = pos.y,
+                    x = pos.x, y = pos.y,
                     health = tree.treeHealth,
                     scale = tree.transform.lossyScale.x
                 });
@@ -132,9 +130,8 @@ public static class SaveManager
             data.trees = treeList.ToArray();
         }
 
-        string json = JsonUtility.ToJson(data, true);
-        File.WriteAllText(SaveFilePath, json);
-        Debug.Log("[SaveManager] Game saved to " + SaveFilePath);
+        string json = JsonUtility.ToJson(data, true);     // serialize ke JSON
+        File.WriteAllText(SaveFilePath, json);             // tulis ke file
     }
 
     public static bool HasSaveData()
@@ -159,9 +156,7 @@ public static class SaveManager
         }
 
         if (data.player != null && GameManager.Instance != null && GameManager.Instance.player != null)
-        {
             GameManager.Instance.player.transform.position = new Vector3(data.player.x, data.player.y, data.player.z);
-        }
 
         var timeAgent = Object.FindObjectOfType<TimeAgent>();
         if (timeAgent != null)
@@ -178,9 +173,7 @@ public static class SaveManager
                     hb.SetItem(i, item, data.hotbar[i].count);
                 }
                 else
-                {
                     hb.SetItem(i, null, 0);
-                }
             }
             hb.RefreshUI();
         }
@@ -196,9 +189,7 @@ public static class SaveManager
                     inv.SetItem(i, item, data.inventory[i].count);
                 }
                 else
-                {
                     inv.SetItem(i, null, 0);
-                }
             }
             inv.RefreshUI();
         }
@@ -227,18 +218,11 @@ public static class SaveManager
         {
             var treeSpawner = Object.FindObjectOfType<TreeSpawner>();
             if (treeSpawner != null)
-            {
                 treeSpawner.RestoreFromSave(data.trees);
-            }
-            else
-            {
-                Debug.LogWarning("[SaveManager] TreeSpawner not found — skipping tree restore");
-            }
         }
-
-        Debug.Log("[SaveManager] Game loaded from " + SaveFilePath);
     }
 
+    // cari item dari Resources/Items/ berdasarkan nama
     private static ItemData ResolveItem(string itemName)
     {
         if (string.IsNullOrEmpty(itemName)) return null;

@@ -21,7 +21,7 @@ public class HotbarManager : MonoBehaviour
     [SerializeField] private Sprite selectedSlotSprite;
 
     [Header("Default Items")]
-    [SerializeField] private DefaultItemEntry[] defaultItems;
+    [SerializeField] private DefaultItemEntry[] defaultItems;   // item awal yg dikasih ke player
 
     [Header("Layout")]
     [SerializeField] private float slotWidth = 70f;
@@ -32,15 +32,15 @@ public class HotbarManager : MonoBehaviour
     [Header("Inventory Data")]
     private int hotbarSize = 9;
     private int selectedIndex = 0;
-    private ItemData[] inventoryItems;
-    private int[] itemCounts;
+    private ItemData[] inventoryItems;                           // item per slot
+    private int[] itemCounts;                                    // jumlah per slot
 
     public ItemData SelectedItem
     {
         get
         {
             if (inventoryItems == null) return null;
-            return inventoryItems[selectedIndex];
+            return inventoryItems[selectedIndex];                // item yg lg terpilih
         }
     }
 
@@ -58,8 +58,6 @@ public class HotbarManager : MonoBehaviour
             GenerateSlots();
             if (slotPrefab == null) return;
         }
-
-        Debug.Log("[HotbarManager] Awake called. uiSlots length: " + (uiSlots?.Length ?? -1));
 
         if (!Application.isPlaying) return;
 
@@ -103,7 +101,6 @@ public class HotbarManager : MonoBehaviour
     void Start()
     {
         if (!Application.isPlaying) return;
-        Debug.Log("[HotbarManager] Start called. selectedIndex=" + selectedIndex);
 
         for (int i = 0; i < uiSlots.Length; i++)
         {
@@ -122,7 +119,7 @@ public class HotbarManager : MonoBehaviour
             foreach (DefaultItemEntry entry in defaultItems)
             {
                 if (entry != null && entry.item != null)
-                    AddItem(entry.item, entry.count);
+                    AddItem(entry.item, entry.count);       // kasih item awal
             }
         }
     }
@@ -160,21 +157,19 @@ public class HotbarManager : MonoBehaviour
         float scroll = Input.GetAxis("Mouse ScrollWheel");
         if (scroll != 0)
         {
-            Debug.Log("[HotbarManager] Scroll detected: " + scroll + " | selectedIndex before: " + selectedIndex);
             if (scroll > 0) selectedIndex--;
             else if (scroll < 0) selectedIndex++;
 
             if (selectedIndex < 0) selectedIndex = hotbarSize - 1;
             if (selectedIndex >= hotbarSize) selectedIndex = 0;
 
-            Debug.Log("[HotbarManager] selectedIndex after: " + selectedIndex);
             UpdateHighlightVisual();
         }
     }
 
-    void HandleNumberKeys()
+    void HandleNumberKeys()                                 // shortcut 1-9 pilih slot
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1)) { Debug.Log("[HotbarManager] Key 1 pressed"); SetSelected(0); }
+        if (Input.GetKeyDown(KeyCode.Alpha1)) SetSelected(0);
         else if (Input.GetKeyDown(KeyCode.Alpha2)) SetSelected(1);
         else if (Input.GetKeyDown(KeyCode.Alpha3)) SetSelected(2);
         else if (Input.GetKeyDown(KeyCode.Alpha4)) SetSelected(3);
@@ -200,10 +195,8 @@ public class HotbarManager : MonoBehaviour
 
         ItemData tempItem = inventoryItems[fromIndex];
         int tempCount = itemCounts[fromIndex];
-
         inventoryItems[fromIndex] = inventoryItems[toIndex];
         itemCounts[fromIndex] = itemCounts[toIndex];
-
         inventoryItems[toIndex] = tempItem;
         itemCounts[toIndex] = tempCount;
     }
@@ -232,35 +225,28 @@ public class HotbarManager : MonoBehaviour
         for (int i = 0; i < uiSlots.Length; i++)
         {
             if (uiSlots[i] != null)
-            {
-                // PASTIKAN memanggil SetHighlight, BUKAN ToggleHighlight
-                uiSlots[i].SetHighlight(i == selectedIndex); 
-            }
+                uiSlots[i].SetHighlight(i == selectedIndex);   // sorot slot yg terpilih
         }
     }
 
     public void RefreshUI()
     {
-        Debug.Log("[HotbarManager] RefreshUI called");
         for (int i = 0; i < uiSlots.Length; i++)
         {
             if (uiSlots[i] != null)
-            {
                 uiSlots[i].UpdateSlot(inventoryItems[i], itemCounts[i]);
-            }
         }
     }
 
     public bool AddItem(ItemData item, int count = 1)
     {
-        Debug.Log("[HotbarManager] AddItem called. item=" + (item != null ? item.itemName : "NULL") + " count=" + count);
         if (item == null) return false;
 
         if (item.isStackable)
         {
             for (int i = 0; i < hotbarSize; i++)
             {
-                if (inventoryItems[i] == item)
+                if (inventoryItems[i] == item)                    // stack ke item yg sama
                 {
                     itemCounts[i] += count;
                     RefreshUI();
@@ -271,7 +257,7 @@ public class HotbarManager : MonoBehaviour
 
         for (int i = 0; i < hotbarSize; i++)
         {
-            if (inventoryItems[i] == null)
+            if (inventoryItems[i] == null)                        // slot kosong
             {
                 inventoryItems[i] = item;
                 itemCounts[i] = count;
@@ -292,7 +278,7 @@ public class HotbarManager : MonoBehaviour
         itemCounts[index] -= count;
         if (itemCounts[index] <= 0)
         {
-            inventoryItems[index] = null;
+            inventoryItems[index] = null;                         // habis → kosongkan slot
             itemCounts[index] = 0;
         }
         RefreshUI();

@@ -6,8 +6,8 @@ public class ParallaxBackground : MonoBehaviour
     public class LayerConfig
     {
         public string resourceName;
-        public float speed;
-        public int sortingOrder;
+        public float speed;                    // kecepatan scroll (makin besar makin cepat)
+        public int sortingOrder;               // urutan layer (0=belakang, 3=depan)
     }
 
     public LayerConfig[] layers = new LayerConfig[]
@@ -18,7 +18,7 @@ public class ParallaxBackground : MonoBehaviour
         new LayerConfig { resourceName = "4", speed = 1.2f, sortingOrder = 3 },
     };
 
-    private SpriteRenderer[][] copies;
+    private SpriteRenderer[][] copies;          // 2 copy per layer buat seamless loop
     private float[] layerWidths;
 
     void Start()
@@ -30,11 +30,7 @@ public class ParallaxBackground : MonoBehaviour
         for (int i = 0; i < layerCount; i++)
         {
             Sprite sprite = Resources.Load<Sprite>("BG/" + layers[i].resourceName);
-            if (sprite == null)
-            {
-                Debug.LogError("Parallax: Sprite BG/" + layers[i].resourceName + " not found!");
-                continue;
-            }
+            if (sprite == null) continue;
 
             layerWidths[i] = sprite.bounds.size.x;
             float w = layerWidths[i];
@@ -50,7 +46,7 @@ public class ParallaxBackground : MonoBehaviour
                 SpriteRenderer sr = copy.AddComponent<SpriteRenderer>();
                 sr.sprite = sprite;
                 sr.sortingOrder = layers[i].sortingOrder;
-                copy.transform.localPosition = new Vector3(j * w, 0, 0);
+                copy.transform.localPosition = new Vector3(j * w, 0, 0);  // 2 copy sejajar
                 copies[i][j] = sr;
             }
         }
@@ -69,13 +65,14 @@ public class ParallaxBackground : MonoBehaviour
             {
                 Transform t = copies[i][j].transform;
                 Vector3 pos = t.localPosition;
-                pos.x -= movement;
-                t.localPosition = pos;
+                pos.x -= movement;                           // geser ke kiri
 
-                if (pos.x <= -w)
+                if (pos.x <= -w)                             // kalo udah lewat batas, loop ke kanan
                 {
-                    t.localPosition = new Vector3(pos.x + w * 2, pos.y, pos.z);
+                    pos.x += w * 2;
                 }
+
+                t.localPosition = pos;
             }
         }
     }

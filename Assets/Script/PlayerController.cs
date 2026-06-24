@@ -9,34 +9,33 @@ public class PlayerController : MonoBehaviour
     private Animator anim;
     private SpriteRenderer spriteRenderer;
     private Rigidbody2D rb; 
-    public Vector2 movement;
-    private string currentAnimation = "";
-    
-    private string lastDirection = "depan"; 
-    
+    public Vector2 movement;                         // nilai input WASD (-1, 0, 1)
+    private string currentAnimation = "";            // state animasi skrg, biar gak re-play
+    private string lastDirection = "depan";          // arah hadap terakhir buat idle & flipX
+
     private Camera mainCam;
     private TilemapReadController tilemapReadController;
     private CropsManager cropsManager;
     private HotbarManager hotbar;
-    private bool isUsingTool = false;
-    private float toolTimer = 0f;
-    private bool toolFirstFrame = true;
-    private bool isWatering = false;
-    private bool isKapak = false;
+    private bool isUsingTool = false;                // lg animasi tool (blokir WASD)
+    private float toolTimer = 0f;                    // countdown durasi animasi tool
+    private bool toolFirstFrame = true;              // frame pertama tool: ambil durasi animasi
+    private bool isWatering = false;                 // lg pake water can (buat pilih prefix animasi)
+    private bool isKapak = false;                    // lg pake kapak
 
-    private bool isWalkingToTarget = false;
-    private Vector3 walkTarget;
-    private Vector3Int walkIntermediateGrid;
-    private Vector3Int walkFinalGrid;
+    private bool isWalkingToTarget = false;          // lg jalan otomatis ke tile target
+    private Vector3 walkTarget;                      // world position tujuan jalan
+    private Vector3Int walkIntermediateGrid;         // grid perantara (kalo target diagonal)
+    private Vector3Int walkFinalGrid;                // grid akhir tujuan
 
-    private Vector3Int? pendingPlowPos;
-    private Vector3Int? pendingWaterPos;
-    private ToolHit pendingTreeHit;
+    private Vector3Int? pendingPlowPos;              // tile yg harus di-cangkul stlh animasi selesai
+    private Vector3Int? pendingWaterPos;             // tile yg harus di-siram
+    private ToolHit pendingTreeHit;                  // pohon yg harus kena hit
 
     [Header("SFX")]
     [SerializeField] private SfxPlayer sfxPlayer;
 
-    private float lastWalkNormalizedTime = 0f;
+    private float lastWalkNormalizedTime = 0f;       // buat deteksi langkah kaki dari normalizedTime animasi
     private bool wasWalking = false;
 
     void Start()
@@ -48,7 +47,6 @@ public class PlayerController : MonoBehaviour
         tilemapReadController = FindFirstObjectByType<TilemapReadController>();
         cropsManager = FindFirstObjectByType<CropsManager>();
         hotbar = FindFirstObjectByType<HotbarManager>();
-
         if (sfxPlayer == null)
             sfxPlayer = GetComponent<SfxPlayer>();
     }
@@ -57,10 +55,10 @@ public class PlayerController : MonoBehaviour
     {
         if (PauseManager.IsPaused) return;
 
-        movement.x = Input.GetAxisRaw("Horizontal");
+        movement.x = Input.GetAxisRaw("Horizontal"); // -1, 0, 1 — instan, tanpa smoothing
         movement.y = Input.GetAxisRaw("Vertical");
 
-        // JALAN KE TARGET (sebelum tool action)
+        // 1. CEK AUTO-WALK (jalan ke target tile)
         if (isWalkingToTarget)
         {
             transform.position = Vector3.MoveTowards(transform.position, walkTarget, moveSpeed * Time.deltaTime);
@@ -70,7 +68,7 @@ public class PlayerController : MonoBehaviour
                 transform.position = walkTarget;
                 isWalkingToTarget = false;
 
-                // Setelah sampe, mulai tool animation sesuai arah
+                // stlh sampe, mainkan tool animation sesuai arah akhir
                 Vector3Int delta = walkFinalGrid - walkIntermediateGrid;
                 string animPrefix = GetToolAnimPrefix();
                 if (delta.x > 0) { lastDirection = "kanan"; ChangeAnimationState(animPrefix + "-kanan"); }
@@ -84,18 +82,18 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        // BLOK GERAK + INPUT selama animasi nyangkul
+        // 2. CEK ANIMASI TOOL (lagi nyangkul/nyiram/ngapak)
         if (isUsingTool)
         {
             if (toolFirstFrame)
             {
                 toolFirstFrame = false;
-                toolTimer = anim.GetCurrentAnimatorStateInfo(0).length;
+                toolTimer = anim.GetCurrentAnimatorStateInfo(0).length; // ambil durasi animasi dari Animator
             }
             else
             {
                 toolTimer -= Time.deltaTime;
-                if (toolTimer <= 0f)
+                if (toolTimer <= 0f) // animasi selesai → eksekusi action
                 {
                     if (pendingPlowPos.HasValue && cropsManager != null)
                     {
@@ -114,7 +112,7 @@ public class PlayerController : MonoBehaviour
                         float treeAnimDuration = 0f;
                         if (pendingTreeHit is TreeCuttable tree)
                             treeAnimDuration = tree.GetHitAnimDuration();
-                        toolTimer += treeAnimDuration;
+                        toolTimer += treeAnimDuration; // tambah waktu buat animasi pohon
                         hasExtended = true;
                         pendingTreeHit.Hit();
                         pendingTreeHit = null;
@@ -135,7 +133,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        // 1. KLIK MOUSE
+        // 3. KLIK KIRI — TOOL / SEED
         if (Input.GetMouseButtonDown(0))
         {
             bool inRange = tilemapReadController == null ||
@@ -163,7 +161,7 @@ public class PlayerController : MonoBehaviour
                 }
                 else if (isSeed && tilemapReadController.CanSeedAt(gridPos))
                 {
-                    cropsManager.Seed(gridPos);
+                    cropsManager.Seed(gridPos);                   // seed langsung, gak perlu animasi
                     pendingTreeHit = null;
                     if (hotbar != null)
                         hotbar.ConsumeItem(hotbar.SelectedIndex, 1);
@@ -188,7 +186,7 @@ public class PlayerController : MonoBehaviour
 
                     Vector3 mouseWorldPos = mainCam.ScreenToWorldPoint(Input.mousePosition);
                     mouseWorldPos.z = 0;
-                    Collider2D[] hits = Physics2D.OverlapCircleAll(mouseWorldPos, 0.6f);
+                    Collider2D[] hits = Physics2D.OverlapCircleAll(mouseWorldPos, 0.6f); // deteksi pohon di area klik
                     pendingTreeHit = null;
                     foreach (Collider2D col in hits)
                     {
@@ -196,7 +194,7 @@ public class PlayerController : MonoBehaviour
                         if (hit != null)
                         {
                             if (hit is TreeCuttable tree && tree.trunkCollider != null && tree.trunkCollider != col)
-                                continue;
+                                continue; // skip kalo yg ke detect adalah daun, bukan batang
                             pendingTreeHit = hit;
                             break;
                         }
@@ -214,19 +212,19 @@ public class PlayerController : MonoBehaviour
                     Vector3Int playerGrid = tilemapReadController.GetPlayerGridPosition();
                     Vector3Int delta = gridPos - playerGrid;
 
-                    if (gridPos == playerGrid)
+                    if (gridPos == playerGrid)       // tile yang sama → tool di tempat
                     {
                         lastDirection = "depan";
                         ChangeAnimationState(GetToolAnimPrefix() + "-depan");
                         isUsingTool = true;
                         PlayToolSfx();
                     }
-                    else if (delta.x != 0 && delta.y != 0)
+                    else if (delta.x != 0 && delta.y != 0) // diagonal → jalan ke intermediate dulu
                     {
                         if (!isKapak)
                             HandleDiagonalClick();
                     }
-                    else if (delta.y != 0)
+                    else if (delta.y != 0)           // vertikal → auto-walk (kecuali kapak)
                     {
                         if (isKapak)
                         {
@@ -244,9 +242,9 @@ public class PlayerController : MonoBehaviour
                             else { lastDirection = "depan"; ChangeAnimationState("jalan-bawah"); }
                         }
                     }
-                    else
+                    else                              // horizontal
                     {
-                        if (isWatering)
+                        if (isWatering)               // nyiram harus auto-walk
                         {
                             walkIntermediateGrid = playerGrid;
                             walkFinalGrid = gridPos;
@@ -258,7 +256,7 @@ public class PlayerController : MonoBehaviour
                         }
                         else
                         {
-                            UpdateMouseDirection();
+                            UpdateMouseDirection();   // cangkul/kapak horizontal langsung dari tempat berdiri
                         }
                     }
                 }
@@ -266,10 +264,10 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        // 2. WASD
+        // 4. WASD — GERAKAN BIASA
         if (movement != Vector2.zero) 
         {
-            if (movement.x < 0) 
+            if (movement.x < 0)                      // prioritas X dulu (horizontal > vertikal)
             {
                 ChangeAnimationState("jalan-kiri");
                 lastDirection = "kiri";
@@ -290,7 +288,7 @@ public class PlayerController : MonoBehaviour
                 lastDirection = "depan"; 
             }
         }
-        // 3. DIAM
+        // 5. DIAM — IDLE
         else 
         {
             if (lastDirection == "kiri") ChangeAnimationState("idle-kiri");
@@ -305,7 +303,7 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         if (isUsingTool || isWalkingToTarget || PauseManager.IsPaused) return;
-        rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
+        rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime); // gerak fisika
     }
 
     void HandleDiagonalClick()
@@ -315,7 +313,7 @@ public class PlayerController : MonoBehaviour
         Vector3Int delta = gridPos - playerGrid;
 
         Vector3Int intermediateGrid = playerGrid;
-        intermediateGrid.y += delta.y > 0 ? 1 : -1;
+        intermediateGrid.y += delta.y > 0 ? 1 : -1;  // jalan ke tile di sumbu Y dulu
 
         walkTarget = tilemapReadController.GridToWorldFeet(intermediateGrid);
         walkTarget.z = 0;
@@ -323,7 +321,6 @@ public class PlayerController : MonoBehaviour
         walkFinalGrid = gridPos;
         isWalkingToTarget = true;
 
-        // Mulai jalan
         lastDirection = delta.y > 0 ? "belakang" : "depan";
         ChangeAnimationState(delta.y > 0 ? "jalan-atas" : "jalan-bawah");
     }
@@ -339,7 +336,7 @@ public class PlayerController : MonoBehaviour
             Vector3Int playerGrid = tilemapReadController.GetPlayerGridPosition();
             Vector3Int delta = gridPos - playerGrid;
 
-            if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
+            if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))   // dominan horizontal
             {
                 lastDirection = delta.x > 0 ? "kanan" : "kiri";
                 animName = toolPrefix + "-kanan";
@@ -355,7 +352,7 @@ public class PlayerController : MonoBehaviour
                 animName = toolPrefix + "-depan";
             }
         }
-        else
+        else   // fallback kalo tilemap gak ada: pake posisi mouse langsung
         {
             Vector3 mousePos = mainCam.ScreenToWorldPoint(Input.mousePosition);
             Vector2 aimDir = mousePos - transform.position;
@@ -395,12 +392,13 @@ public class PlayerController : MonoBehaviour
         sfxPlayer.Play(currentAnimation);
     }
 
+    // deteksi langkah kaki dari normalizedTime animasi, mainkan sfx bergantian kiri-kanan
     private void DetectFootstep()
     {
         if (currentAnimation.StartsWith("jalan-"))
         {
             float currentNorm = anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
-            float norm = currentNorm - Mathf.Floor(currentNorm);
+            float norm = currentNorm - Mathf.Floor(currentNorm); // 0.0 - 1.0 (loop)
 
             if (!wasWalking)
             {
@@ -409,11 +407,9 @@ public class PlayerController : MonoBehaviour
                 return;
             }
 
-            // Wrap around (0.9→0.1) = one footstep
-            if (lastWalkNormalizedTime > 0.7f && norm < 0.3f)
+            if (lastWalkNormalizedTime > 0.7f && norm < 0.3f)    // wrap 0.9 → 0.1 = 1 langkah
                 sfxPlayer.PlaySequential(currentAnimation);
-            // Mid-cycle (~0.5) = other footstep
-            else if (lastWalkNormalizedTime < 0.4f && norm >= 0.4f)
+            else if (lastWalkNormalizedTime < 0.4f && norm >= 0.4f) // mid-cycle = langkah satunya
                 sfxPlayer.PlaySequential(currentAnimation);
 
             lastWalkNormalizedTime = norm;
@@ -427,14 +423,15 @@ public class PlayerController : MonoBehaviour
     void ChangeAnimationState(string newAnimation)
     {
         if (currentAnimation == newAnimation && !newAnimation.StartsWith("nyangkul-") && !newAnimation.StartsWith("nyiram-") && !newAnimation.StartsWith("ngapak-")) return;
+        // kalo state sama & bukan tool → skip. Tool harus tetap di-restart biar animasi muter dari awal
 
-        anim.Play(newAnimation);
+        anim.Play(newAnimation);                    // Unity: mainkan state di Animator Controller
         currentAnimation = newAnimation;
 
         if (spriteRenderer != null)
         {
             bool isToolAnim = currentAnimation.StartsWith("nyangkul-") || currentAnimation.StartsWith("nyiram-") || currentAnimation.StartsWith("ngapak-");
-            spriteRenderer.flipX = isToolAnim && lastDirection == "kiri";
+            spriteRenderer.flipX = isToolAnim && lastDirection == "kiri"; // flip sprite tool kalo arah kiri
         }
     }
 }

@@ -8,8 +8,8 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private Transform inventoryGrid;
     [SerializeField] private Sprite selectedSlotSprite;
 
-    private ItemData[] inventoryItems;
-    private int[] itemCounts;
+    private ItemData[] inventoryItems;               // array item per slot
+    private int[] itemCounts;                        // jumlah item per slot
 
     public SlotUI[] InventorySlots => inventorySlots;
     public ItemData[] InventoryItems => inventoryItems;
@@ -20,7 +20,7 @@ public class InventoryManager : MonoBehaviour
     void Start()
     {
         if (inventoryPanel != null)
-            inventoryPanel.SetActive(false);
+            inventoryPanel.SetActive(false);          // inventory mulai dalam keadaan tertutup
 
         FindExistingSlots();
     }
@@ -44,8 +44,6 @@ public class InventoryManager : MonoBehaviour
             inventorySlots[i].SetSelectedSprite(selectedSlotSprite);
             inventorySlots[i].UpdateSlot(null, 0);
         }
-
-        Debug.Log($"[InventoryManager] Found {inventorySlots.Length} existing slots under {inventoryGrid.name}");
     }
 
     void Update()
@@ -84,7 +82,7 @@ public class InventoryManager : MonoBehaviour
         {
             for (int i = 0; i < inventorySlots.Length; i++)
             {
-                if (inventoryItems[i] == item)
+                if (inventoryItems[i] == item)       // stack ke slot yang sama
                 {
                     itemCounts[i] += count;
                     RefreshUI();
@@ -95,7 +93,7 @@ public class InventoryManager : MonoBehaviour
 
         for (int i = 0; i < inventorySlots.Length; i++)
         {
-            if (inventoryItems[i] == null)
+            if (inventoryItems[i] == null)            // slot kosong
             {
                 inventoryItems[i] = item;
                 itemCounts[i] = count;
@@ -117,10 +115,8 @@ public class InventoryManager : MonoBehaviour
 
         ItemData tempItem = inventoryItems[fromIndex];
         int tempCount = itemCounts[fromIndex];
-
         inventoryItems[fromIndex] = inventoryItems[toIndex];
         itemCounts[fromIndex] = itemCounts[toIndex];
-
         inventoryItems[toIndex] = tempItem;
         itemCounts[toIndex] = tempCount;
     }

@@ -12,6 +12,7 @@ public class MainMenu : MonoBehaviour
 
     private void Awake()
     {
+        // auto-load sound clips kalo belum diassign
         if (hoverClip == null)
             hoverClip = Resources.Load<AudioClip>("Audio/hover");
         if (clickClip == null)
@@ -19,7 +20,7 @@ public class MainMenu : MonoBehaviour
 
         var allButtons = FindObjectsByType<Button>(FindObjectsSortMode.None);
         foreach (var btn in allButtons)
-            AddButtonSound(btn.gameObject);
+            AddButtonSound(btn.gameObject);                   // pasang sound ke semua button
     }
 
     private void Start()
@@ -32,7 +33,6 @@ public class MainMenu : MonoBehaviour
         if (optionPanel == null) return;
         Transform panel = optionPanel.transform;
 
-        // Master volume slider
         if (masterVolumeSlider == null)
         {
             Transform t = FindDeepChild(panel, "Slider master volume");
@@ -44,7 +44,6 @@ public class MainMenu : MonoBehaviour
             masterVolumeSlider.onValueChanged.AddListener(OnMasterVolumeChanged);
         }
 
-        // SFX volume slider
         if (sfxVolumeSlider == null)
         {
             Transform t = FindDeepChild(panel, "Slider SFX");
@@ -85,13 +84,12 @@ public class MainMenu : MonoBehaviour
         if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.N))
         {
             SaveManager.DeleteSave();
-            Debug.Log("Save data deleted!");
         }
     }
 
     public void PlayGame()
     {
-        SceneManager.LoadScene(1);
+        SceneManager.LoadScene(1);                           // load scene game
     }
 
     public void OpenOption()

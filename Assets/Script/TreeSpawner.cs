@@ -29,7 +29,7 @@ public class TreeSpawner : MonoBehaviour
             GameObject newTree = Instantiate(treeTemplate, pos.Value, Quaternion.identity);
             newTree.SetActive(true);
 
-            float scale = Random.Range(0.8f, 1.3f);
+            float scale = Random.Range(0.8f, 1.3f);       // random ukuran pohon
             newTree.transform.localScale = new Vector3(scale, scale, 1);
 
             TreeCuttable[] cuttables = newTree.GetComponentsInChildren<TreeCuttable>();
@@ -45,11 +45,10 @@ public class TreeSpawner : MonoBehaviour
         }
     }
 
-    public void RestoreFromSave(SaveManager.TreeSaveData[] savedTrees)
+    public void RestoreFromSave(SaveManager.TreeSaveData[] savedTrees)  // restore pohon dari save
     {
         if (treeTemplate == null) return;
 
-        // Destroy all existing trees
         var existingTrees = FindObjectsOfType<TreeCuttable>();
         foreach (var t in existingTrees)
         {
@@ -59,12 +58,9 @@ public class TreeSpawner : MonoBehaviour
                 Destroy(t.wholeTreeObject);
             }
             else
-            {
                 Destroy(t.gameObject);
-            }
         }
 
-        // Restore from saved data
         foreach (var treeData in savedTrees)
         {
             Vector3 pos = new Vector3(treeData.x, treeData.y, 0);
@@ -88,6 +84,7 @@ public class TreeSpawner : MonoBehaviour
         }
     }
 
+    // cari posisi random yg gak tumpuk dengan pohon lain (max 30 percobaan)
     Vector3? GetRandomPosition()
     {
         for (int attempt = 0; attempt < 30; attempt++)

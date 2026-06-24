@@ -14,7 +14,7 @@ public class SfxPlayer : MonoBehaviour
     [SerializeField] private SfxEntry[] entries;
 
     private AudioSource audioSource;
-    private int[] sequentialIndex;
+    private int[] sequentialIndex;              // tracker buat play sequential (kiri/kanan bergantian)
 
     void Awake()
     {
@@ -23,7 +23,7 @@ public class SfxPlayer : MonoBehaviour
         audioSource.enabled = true;
     }
 
-    public void Play()
+    public void Play()                           // random dari semua entries
     {
         if (entries == null || entries.Length == 0) return;
 
@@ -31,7 +31,7 @@ public class SfxPlayer : MonoBehaviour
         PlayEntry(entry);
     }
 
-    public void Play(string id)
+    public void Play(string id)                  // random dari entries dengan id tertentu
     {
         if (entries == null || entries.Length == 0) return;
 
@@ -56,7 +56,7 @@ public class SfxPlayer : MonoBehaviour
         }
     }
 
-    public void PlaySequential(string id)
+    public void PlaySequential(string id)        // gantian (buat langkah kaki kiri-kanan)
     {
         if (entries == null || entries.Length == 0) return;
 
@@ -76,7 +76,7 @@ public class SfxPlayer : MonoBehaviour
         if (sequentialIndex == null) sequentialIndex = new int[0];
         if (sequentialIndex.Length != entries.Length) sequentialIndex = new int[entries.Length];
 
-        int idx = sequentialIndex[first] % count;
+        int idx = sequentialIndex[first] % count;            // ambil index bergantian
         sequentialIndex[first] = idx + 1;
 
         int found = 0;
@@ -97,7 +97,7 @@ public class SfxPlayer : MonoBehaviour
     private void PlayEntry(SfxEntry entry)
     {
         if (entry.clip == null) return;
-        if (MusicManager.SFXVolume <= 0.0001f)
+        if (MusicManager.SFXVolume <= 0.0001f)                // volume 0 → mute
         {
             audioSource.enabled = false;
             audioSource.mute = true;
@@ -108,7 +108,7 @@ public class SfxPlayer : MonoBehaviour
         audioSource.volume = MusicManager.SFXVolume;
 
         if (entry.delay > 0f)
-            StartCoroutine(PlayDelayed(entry));
+            StartCoroutine(PlayDelayed(entry));               // play dengan delay (sinkron animasi)
         else
             audioSource.PlayOneShot(entry.clip);
     }

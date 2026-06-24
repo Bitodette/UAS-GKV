@@ -5,7 +5,7 @@ public class PickupItem : MonoBehaviour
     Transform player;
     [SerializeField] float speed = 5f;
     [SerializeField] float pickupRange = 1f;
-    [SerializeField] float timeToLive = 30f;
+    [SerializeField] float timeToLive = 30f;          // ilang otomatis setelah 30 detik
 
     [Header("Item Info")]
     public ItemData itemData;
@@ -14,22 +14,21 @@ public class PickupItem : MonoBehaviour
 
     private void Start()
     {
-        Debug.Log("[PickupItem] Start. GameManager.Instance=" + (GameManager.Instance != null) + " player=" + (GameManager.Instance != null ? GameManager.Instance.player : "NULL") + " itemData=" + (itemData != null ? itemData.itemName : "NULL"));
-        if (GameManager.Instance == null) { Debug.LogError("[PickupItem] GameManager.Instance is NULL!"); return; }
-        if (GameManager.Instance.player == null) { Debug.LogError("[PickupItem] GameManager.Instance.player is NULL!"); return; }
+        if (GameManager.Instance == null) return;
+        if (GameManager.Instance.player == null) return;
         player = GameManager.Instance.player.transform;
-        Destroy(gameObject, timeToLive);
+        Destroy(gameObject, timeToLive);               // auto destroy kalo gak diambil
     }
 
     private void Update()
     {
-        if (player == null) { Debug.LogWarning("[PickupItem] player is null!"); return; }
+        if (player == null) return;
 
         float distance = Vector2.Distance(transform.position, player.position);
 
-        if (distance > pickupRange) return;
+        if (distance > pickupRange) return;             // di luar jangkauan
 
-        transform.position = Vector3.MoveTowards(
+        transform.position = Vector3.MoveTowards(       // lerp ke player
             transform.position,
             player.position,
             speed * Time.deltaTime
@@ -37,9 +36,8 @@ public class PickupItem : MonoBehaviour
 
         if (distance < 0.1f)
         {
-            Debug.Log("[PickupItem] Picked up! itemData=" + (itemData != null ? itemData.itemName : "NULL"));
             if (itemData != null)
-                GameManager.Instance.AddItem(itemData);
+                GameManager.Instance.AddItem(itemData); // masukin inventory
             Destroy(gameObject);
         }
     }

@@ -19,11 +19,11 @@ public class SeedController : MonoBehaviour
         if (tilemapReadController == null || !tilemapReadController.IsSeedSelected()) return;
 
         Vector3Int gridPos = tilemapReadController.GetMouseGridPosition();
-        if (!tilemapReadController.CanSeedAt(gridPos)) return;
+        if (!tilemapReadController.CanSeedAt(gridPos)) return;  // cek apakah bisa ditanam
 
         if (cropsManager != null)
-            cropsManager.Seed(gridPos);
+            cropsManager.Seed(gridPos);                          // tanam
         if (hotbarManager != null)
-            hotbarManager.ConsumeItem(hotbarManager.SelectedIndex, 1);
+            hotbarManager.ConsumeItem(hotbarManager.SelectedIndex, 1);  // kurangi 1 benih
     }
 }

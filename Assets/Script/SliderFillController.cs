@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+// update fill slider UI sesuai value slider
 public class SliderFillController : MonoBehaviour
 {
     private Image fillImage;
@@ -14,12 +15,12 @@ public class SliderFillController : MonoBehaviour
         if (parentSlider != null)
         {
             parentSlider.onValueChanged.AddListener(OnSliderValueChanged);
-            OnSliderValueChanged(parentSlider.value);
+            OnSliderValueChanged(parentSlider.value);   // set awal
         }
     }
 
     private void OnSliderValueChanged(float value)
     {
-        fillImage.fillAmount = value;
+        fillImage.fillAmount = value;                   // isi fill sesuai value slider
     }
 }

@@ -17,30 +17,20 @@ public class ButtonHoverSound : MonoBehaviour, IPointerEnterHandler, IPointerCli
         audioSource.enabled = true;
     }
 
-    public void OnPointerEnter(PointerEventData eventData)
+    public void OnPointerEnter(PointerEventData eventData)   // hover → play sound
     {
         if (hoverClip == null || audioSource == null) return;
-        if (MusicManager.SFXVolume <= 0.0001f)
-        {
-            audioSource.enabled = false;
-            audioSource.mute = true;
-            return;
-        }
+        if (MusicManager.SFXVolume <= 0.0001f) { audioSource.enabled = false; audioSource.mute = true; return; }
         audioSource.enabled = true;
         audioSource.mute = false;
         audioSource.volume = MusicManager.SFXVolume;
         audioSource.PlayOneShot(hoverClip);
     }
 
-    public void OnPointerClick(PointerEventData eventData)
+    public void OnPointerClick(PointerEventData eventData)   // klik → play sound
     {
         if (clickClip == null || audioSource == null) return;
-        if (MusicManager.SFXVolume <= 0.0001f)
-        {
-            audioSource.enabled = false;
-            audioSource.mute = true;
-            return;
-        }
+        if (MusicManager.SFXVolume <= 0.0001f) { audioSource.enabled = false; audioSource.mute = true; return; }
         audioSource.enabled = true;
         audioSource.mute = false;
         audioSource.volume = MusicManager.SFXVolume;

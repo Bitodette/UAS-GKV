@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class PauseManager : MonoBehaviour
 {
     public static PauseManager Instance;
-    public static bool IsPaused { get; private set; }
+    public static bool IsPaused { get; private set; }     // static, dicek script lain buat blokir input
 
     [SerializeField] private GameObject pausePanel;
     [SerializeField] private GameObject optionPanel;
@@ -16,7 +16,7 @@ public class PauseManager : MonoBehaviour
     {
         if (Instance != null && Instance != this)
         {
-            Destroy(gameObject);
+            Destroy(gameObject);                            // cegah duplicate
             return;
         }
         Instance = this;
@@ -26,11 +26,8 @@ public class PauseManager : MonoBehaviour
     {
         AutoFindUI();
 
-        if (pausePanel != null)
-            pausePanel.SetActive(false);
-
-        if (optionPanel != null)
-            optionPanel.SetActive(false);
+        if (pausePanel != null) pausePanel.SetActive(false);
+        if (optionPanel != null) optionPanel.SetActive(false);
 
         AutoWire();
     }
@@ -43,7 +40,6 @@ public class PauseManager : MonoBehaviour
             if (pp != null && pp.scene.name != null)
                 pausePanel = pp;
         }
-
         if (optionPanel == null)
         {
             GameObject op = GameObject.Find("OptionPanel");
@@ -60,7 +56,6 @@ public class PauseManager : MonoBehaviour
             WireButton(pausePanel.transform, "Option", OpenOptions);
             WireButton(pausePanel.transform, "Save and Quit", SaveAndQuit);
         }
-
         if (optionPanel != null)
         {
             WireButton(optionPanel.transform, "BackButton", CloseOptions);
@@ -85,14 +80,10 @@ public class PauseManager : MonoBehaviour
 
     private void AddHoverSound(GameObject go)
     {
-        if (hoverClip == null)
-            hoverClip = Resources.Load<AudioClip>("Audio/hover");
-        if (clickClip == null)
-            clickClip = Resources.Load<AudioClip>("Audio/click");
-
+        if (hoverClip == null) hoverClip = Resources.Load<AudioClip>("Audio/hover");
+        if (clickClip == null) clickClip = Resources.Load<AudioClip>("Audio/click");
         var hs = go.GetComponent<ButtonHoverSound>();
-        if (hs == null)
-            hs = go.AddComponent<ButtonHoverSound>();
+        if (hs == null) hs = go.AddComponent<ButtonHoverSound>();
         if (hoverClip != null) hs.hoverClip = hoverClip;
         if (clickClip != null) hs.clickClip = clickClip;
     }
@@ -125,7 +116,7 @@ public class PauseManager : MonoBehaviour
             Slider sl = t.GetComponent<Slider>();
             if (sl != null)
             {
-                sl.value = MusicManager.SFXVolume;
+                sl.value = PlayerPrefs.GetFloat("SFXVolume", 1f);
                 sl.onValueChanged.AddListener(OnSFXVolumeChanged);
             }
         }
@@ -162,20 +153,16 @@ public class PauseManager : MonoBehaviour
     private void PauseGame()
     {
         IsPaused = true;
-        Time.timeScale = 0f;
+        Time.timeScale = 0f;                               // freeze game
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        if (pausePanel != null)
-            pausePanel.SetActive(true);
-
-        if (optionPanel != null)
-            optionPanel.SetActive(false);
+        if (pausePanel != null) pausePanel.SetActive(true);
+        if (optionPanel != null) optionPanel.SetActive(false);
 
         InventoryManager inv = FindFirstObjectByType<InventoryManager>();
-        if (inv != null)
-            inv.CloseInventory();
+        if (inv != null) inv.CloseInventory();
     }
 
     public void ResumeGame()
@@ -185,11 +172,8 @@ public class PauseManager : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.None;
 
-        if (pausePanel != null)
-            pausePanel.SetActive(false);
-
-        if (optionPanel != null)
-            optionPanel.SetActive(false);
+        if (pausePanel != null) pausePanel.SetActive(false);
+        if (optionPanel != null) optionPanel.SetActive(false);
     }
 
     public void OpenOptions()
@@ -206,9 +190,9 @@ public class PauseManager : MonoBehaviour
 
     public void SaveAndQuit()
     {
-        SaveManager.Save();
+        SaveManager.Save();                                  // simpan dulu
         IsPaused = false;
         Time.timeScale = 1f;
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene(0);                           // kembali ke main menu
     }
 }

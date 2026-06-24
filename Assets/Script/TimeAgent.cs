@@ -4,7 +4,7 @@ public class TimeAgent : MonoBehaviour
 {
     [SerializeField] private CropsManager cropsManager;
 
-    public int currentDay = 1;
+    public int currentDay = 1;                    // hari ke berapa
 
     void Start()
     {
@@ -16,7 +16,7 @@ public class TimeAgent : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.B))
         {
-            GoToNextDay();
+            GoToNextDay();                        // tekan B buat lanjut ke hari berikutnya
         }
     }
 
@@ -26,6 +26,6 @@ public class TimeAgent : MonoBehaviour
         Debug.Log($"--- Hari ke-{currentDay} ---");
 
         if (cropsManager != null)
-            cropsManager.GrowAll();
+            cropsManager.GrowAll();               // tumbuhkan semua tanaman yg di-siram
     }
 }

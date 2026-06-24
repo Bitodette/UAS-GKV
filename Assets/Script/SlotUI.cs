@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 
+// handle semua event UI: klik, drag-drop, hover
 public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointerEnterHandler, IPointerExitHandler,
     IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -16,7 +17,7 @@ public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointe
     private Sprite defaultSprite;
     private Color defaultColor;
     private int slotIndex;
-    private bool isInventorySlot;
+    private bool isInventorySlot;               // true = inventory, false = hotbar
 
     private CanvasGroup canvasGroup;
     private Transform iconTransform;
@@ -32,42 +33,31 @@ public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointe
             defaultColor = slotImage.color;
         }
 
-        if (hoverOverlay != null)
-            hoverOverlay.SetActive(false);
+        if (hoverOverlay != null) hoverOverlay.SetActive(false);
 
         canvasGroup = GetComponent<CanvasGroup>();
-        if (canvasGroup == null)
-            canvasGroup = gameObject.AddComponent<CanvasGroup>();
+        if (canvasGroup == null) canvasGroup = gameObject.AddComponent<CanvasGroup>();
 
         if (iconImage != null)
         {
             iconTransform = iconImage.transform;
-            iconImage.raycastTarget = false;
+            iconImage.raycastTarget = false;     // biar gak blocking drag
         }
     }
 
-    public void SetSlotIndex(int index)
-    {
-        slotIndex = index;
-    }
-
-    public void SetIsInventorySlot(bool value)
-    {
-        isInventorySlot = value;
-    }
-
+    public void SetSlotIndex(int index) { slotIndex = index; }
+    public void SetIsInventorySlot(bool value) { isInventorySlot = value; }
     public bool IsInventorySlot => isInventorySlot;
     public int SlotIndex => slotIndex;
 
     public void SetSelectedSprite(Sprite sprite)
     {
-        if (sprite != null)
-            selectedSprite = sprite;
+        if (sprite != null) selectedSprite = sprite;
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (!isInventorySlot)
+        if (!isInventorySlot)                    // hotbar slot → pilih item (shortcut)
         {
             HotbarManager hotbar = FindFirstObjectByType<HotbarManager>();
             if (hotbar != null && slotIndex < 9)
@@ -77,21 +67,20 @@ public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointe
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (hoverOverlay != null)
-            hoverOverlay.SetActive(true);
+        if (hoverOverlay != null) hoverOverlay.SetActive(true);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (hoverOverlay != null)
-            hoverOverlay.SetActive(false);
+        if (hoverOverlay != null) hoverOverlay.SetActive(false);
     }
 
+    // DRAG & DROP — pindahin item antar slot
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (iconImage == null || iconImage.sprite == null) return;
 
-        if (isInventorySlot)
+        if (isInventorySlot)                     // inventory cuma bisa di-drag kalo panel kebuka
         {
             InventoryManager inventory = FindFirstObjectByType<InventoryManager>();
             if (inventory == null || inventory.InventoryPanel == null || !inventory.InventoryPanel.activeSelf)
@@ -102,21 +91,19 @@ public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointe
         }
 
         parentAfterDrag = transform;
-
-        iconTransform.SetParent(transform.root);
+        iconTransform.SetParent(transform.root);  // bawa icon ke root canvas
         iconTransform.SetAsLastSibling();
 
         countWasActive = countText != null && countText.gameObject.activeSelf;
-        if (countText != null)
-            countText.gameObject.SetActive(false);
+        if (countText != null) countText.gameObject.SetActive(false);
 
-        canvasGroup.blocksRaycasts = false;
+        canvasGroup.blocksRaycasts = false;       // biar gak block drop target
     }
 
     public void OnDrag(PointerEventData eventData)
     {
         if (iconImage == null || iconImage.sprite == null) return;
-        iconTransform.position = Input.mousePosition;
+        iconTransform.position = Input.mousePosition;  // ikutin mouse
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -163,7 +150,7 @@ public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointe
         ItemData targetItem = hotbar.GetItem(toIndex);
         int targetCount = hotbar.GetItemCount(toIndex);
 
-        if (CanStack(sourceItem, targetItem))
+        if (CanStack(sourceItem, targetItem))             // stack kalo item sama
         {
             hotbar.SetItem(toIndex, targetItem, targetCount + sourceCount);
             hotbar.SetItem(fromIndex, null, 0);
@@ -171,7 +158,7 @@ public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointe
             return;
         }
 
-        hotbar.SwapSlot(fromIndex, toIndex);
+        hotbar.SwapSlot(fromIndex, toIndex);               // swap kalo beda
         hotbar.RefreshUI();
     }
 
@@ -212,7 +199,6 @@ public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointe
                 inventory.RefreshUI();
                 return;
             }
-
             hotbar.SetItem(hotbarIndex, inventoryItem, inventoryCount);
             inventory.SetItem(inventoryIndex, hotbarItem, hotbarCount);
         }
@@ -226,7 +212,6 @@ public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointe
                 inventory.RefreshUI();
                 return;
             }
-
             hotbar.SetItem(hotbarIndex, inventoryItem, inventoryCount);
             inventory.SetItem(inventoryIndex, hotbarItem, hotbarCount);
         }
@@ -235,7 +220,7 @@ public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointe
         inventory.RefreshUI();
     }
 
-    private bool CanStack(ItemData a, ItemData b)
+    private bool CanStack(ItemData a, ItemData b)   // item sama DAN stackable?
     {
         if (a == null || b == null) return false;
         if (a != b) return false;
@@ -250,7 +235,7 @@ public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointe
             iconImage.preserveAspect = true;
             iconImage.gameObject.SetActive(true);
             iconImage.enabled = true;
-            countText.text = count > 1 ? count.ToString() : "";
+            countText.text = count > 1 ? count.ToString() : "";   // jumlah > 1 baru ditampilin
             countText.gameObject.SetActive(true);
 
             if (item.itemName == "Wheat" || item.itemName == "Wheat Seed")
@@ -268,7 +253,7 @@ public class SlotUI : MonoBehaviour, IPointerClickHandler, IDropHandler, IPointe
         }
     }
 
-    public void SetHighlight(bool isActive)
+    public void SetHighlight(bool isActive)          // sorot slot (selected border)
     {
         if (slotImage == null) return;
 

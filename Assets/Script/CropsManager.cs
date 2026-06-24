@@ -2,11 +2,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+// data class tiap tanaman (bukan MonoBehaviour — cuma wadah data)
 public class Crops
 {
-    public bool isWatered;
-    public bool seeded;
-    public int growthStage;
+    public bool isWatered;           // sudah di-siram
+    public bool seeded;              // sudah ditanam
+    public int growthStage;          // tahap pertumbuhan (0 = baru ditanam, max = siap panen)
 }
 
 public class CropsManager : MonoBehaviour
@@ -15,15 +16,15 @@ public class CropsManager : MonoBehaviour
     [SerializeField] private Sprite plowedSprite;
     [SerializeField] private TileBase seeded;
     [SerializeField] private TileBase watered;
-    [SerializeField] private Tilemap targetTilemap;
-    [SerializeField] private Tilemap seedTilemap;
-    [SerializeField] private Tilemap wateredTilemap;
-    [SerializeField] private Tilemap overlayTilemap;
-    [SerializeField] private TileBase[] growthTiles;
+    [SerializeField] private Tilemap targetTilemap;       // tilemap tanah
+    [SerializeField] private Tilemap seedTilemap;         // tilemap tanaman (sorting order rendah)
+    [SerializeField] private Tilemap wateredTilemap;      // tilemap air
+    [SerializeField] private Tilemap overlayTilemap;      // tilemap overlay (sorting order tinggi)
+    [SerializeField] private TileBase[] growthTiles;      // tile tiap tahap tumbuh
     [SerializeField] private Transform playerRef;
     [SerializeField] private float playerCenterOffset = 0f;
 
-    private Dictionary<Vector3Int, Crops> crops;
+    private Dictionary<Vector3Int, Crops> crops;          // semua tanaman yg ada
     private TileBase plowedTile;
 
     private void Start()
@@ -33,7 +34,7 @@ public class CropsManager : MonoBehaviour
         if (plowed != null)
             plowedTile = plowed;
         else if (plowedSprite != null)
-            plowedTile = CreateTileFromSprite(plowedSprite);
+            plowedTile = CreateTileFromSprite(plowedSprite);  // bikin tile dari sprite procedural
 
         if (playerRef == null && GameManager.Instance != null && GameManager.Instance.player != null)
             playerRef = GameManager.Instance.player.transform;
@@ -61,14 +62,12 @@ public class CropsManager : MonoBehaviour
 
             Vector3Int pos = kvp.Key;
             int dx = Mathf.Abs(pos.x - playerGrid.x);
-            int dy = pos.y - playerGrid.y;
+            int dy = pos.y - playerGrid.y;                // BUKAN Mathf.Abs! — negatif = di depan player
 
             TileBase tile = srcMap.GetTile(pos);
-            if (tile == null)
-                tile = overlayTilemap.GetTile(pos);
+            if (tile == null) tile = overlayTilemap.GetTile(pos);
             if (tile == null) continue;
 
-            // Cek apakah tile ini crops besar (growthTiles index >= 1 = crops_3+)
             bool thisIsLargeCrop = false;
             if (growthTiles != null)
             {
@@ -82,12 +81,14 @@ public class CropsManager : MonoBehaviour
                 }
             }
 
+            // dy < 0 = crop di bawah player (lebih depan secara visual)
             bool cropInFront = dy < 0 || (dy == 0 && dx <= 1);
             if (thisIsLargeCrop && dy == 1 && dx <= 1)
                 cropInFront = true;
 
             if (cropInFront)
             {
+                // pindahin ke overlay tilemap (sorting order tinggi) biar di depan player
                 if (overlayTilemap.GetTile(pos) != tile)
                 {
                     srcMap.SetTile(pos, null);
@@ -97,6 +98,7 @@ public class CropsManager : MonoBehaviour
             }
             else
             {
+                // pindahin balik ke seed tilemap (sorting order rendah) biar di belakang player
                 if (overlayTilemap.GetTile(pos) != null)
                 {
                     overlayTilemap.SetTile(pos, null);
@@ -105,9 +107,6 @@ public class CropsManager : MonoBehaviour
                 }
             }
         }
-
-        if (moved > 0)
-            Debug.Log($"[CropsManager] Moved {moved} crops, playerGrid=({playerGrid.x},{playerGrid.y})");
     }
 
     private TileBase CreateTileFromSprite(Sprite sprite)
@@ -134,7 +133,7 @@ public class CropsManager : MonoBehaviour
         crops.Clear();
     }
 
-    public void RestoreCrop(Vector3Int pos, Crops crop)
+    public void RestoreCrop(Vector3Int pos, Crops crop)   // restore dari save data
     {
         crops[pos] = crop;
 
@@ -160,7 +159,7 @@ public class CropsManager : MonoBehaviour
 
     public bool Check(Vector3Int position)
     {
-        return crops.ContainsKey(position);
+        return crops.ContainsKey(position);                 // apakah tile ini sudah di-cangkul?
     }
 
     public bool IsWatered(Vector3Int position)
@@ -175,7 +174,7 @@ public class CropsManager : MonoBehaviour
         return false;
     }
 
-    public void Plow(Vector3Int position)
+    public void Plow(Vector3Int position)                    // cangkul tanah
     {
         if (crops.ContainsKey(position))
             return;
@@ -183,7 +182,7 @@ public class CropsManager : MonoBehaviour
         CreatePlowedTile(position);
     }
 
-    public void Water(Vector3Int position)
+    public void Water(Vector3Int position)                   // siram tanaman
     {
         if (!crops.TryGetValue(position, out Crops crop))
         {
@@ -193,18 +192,10 @@ public class CropsManager : MonoBehaviour
 
         crop.isWatered = true;
 
-        if (watered == null)
-            Debug.LogError("Watered tile (TileBase) is not assigned in CropsManager!");
-        if (wateredTilemap == null)
-            Debug.LogError("Watered Tilemap is not assigned in CropsManager!");
-
         if (watered != null && wateredTilemap != null)
         {
             wateredTilemap.SetTile(position, watered);
-            Debug.Log($"Watered tile set at {position} on wateredTilemap");
         }
-
-        Debug.Log($"Watered tile at {position}");
     }
 
     private void SetCropTile(Vector3Int position, TileBase tile)
@@ -219,13 +210,10 @@ public class CropsManager : MonoBehaviour
             map.SetTile(position, tile);
     }
 
-    public void Seed(Vector3Int position)
+    public void Seed(Vector3Int position)                    // tanam benih
     {
-        if (!crops.ContainsKey(position))
-            return;
-
-        if (crops[position].seeded)
-            return;
+        if (!crops.ContainsKey(position)) return;
+        if (crops[position].seeded) return;
 
         crops[position].seeded = true;
         crops[position].growthStage = 0;
@@ -233,13 +221,13 @@ public class CropsManager : MonoBehaviour
         SetCropTile(position, seeded);
     }
 
-    public void GrowAll()
+    public void GrowAll()                                    // tumbuhkan semua tanaman (panggil tiap hari baru)
     {
         foreach (var kvp in crops)
         {
             if (!kvp.Value.seeded) continue;
             if (kvp.Value.growthStage >= growthTiles.Length) continue;
-            if (!kvp.Value.isWatered) continue;
+            if (!kvp.Value.isWatered) continue;              // cuma tanaman yg di-siram yg tumbuh
 
             kvp.Value.isWatered = false;
             if (wateredTilemap != null)
@@ -257,19 +245,17 @@ public class CropsManager : MonoBehaviour
         return crops[position].growthStage >= growthTiles.Length;
     }
 
-    public bool Harvest(Vector3Int position)
+    public bool Harvest(Vector3Int position)                 // panen
     {
         if (!IsFullyGrown(position)) return false;
 
         crops[position].seeded = false;
         crops[position].growthStage = 0;
 
-        if (seedTilemap != null)
-            seedTilemap.SetTile(position, null);
-        if (overlayTilemap != null)
-            overlayTilemap.SetTile(position, null);
+        if (seedTilemap != null) seedTilemap.SetTile(position, null);
+        if (overlayTilemap != null) overlayTilemap.SetTile(position, null);
         if (targetTilemap != null && plowedTile != null)
-            targetTilemap.SetTile(position, plowedTile);
+            targetTilemap.SetTile(position, plowedTile);     // balikin ke tanah cangkul
 
         return true;
     }
@@ -277,9 +263,7 @@ public class CropsManager : MonoBehaviour
     private void CreatePlowedTile(Vector3Int position)
     {
         Crops crop = new Crops();
-
         crops.Add(position, crop);
-        Debug.Log($"CreatePlowedTile: plowedTile={(plowedTile != null ? plowedTile.name : "NULL")} targetTilemap={targetTilemap != null}");
         if (plowedTile != null && targetTilemap != null)
             targetTilemap.SetTile(position, plowedTile);
     }

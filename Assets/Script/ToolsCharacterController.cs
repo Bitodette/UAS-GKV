@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+
+// VERSI LAMA — tool system yang sudah digantikan PlayerController + CropsManager
 public class ToolsCharacterController : MonoBehaviour
 {
     Rigidbody2D rb;
@@ -61,43 +63,20 @@ public class ToolsCharacterController : MonoBehaviour
     private void CanSelectCheck()
     {
         Vector2 characterPosition = transform.position;
-        Vector2 mousePosition =
-            mainCam.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 mousePosition = mainCam.ScreenToWorldPoint(Input.mousePosition);
 
-        selectable =
-            Vector2.Distance(
-                characterPosition,
-                mousePosition
-            ) <= maxUseDistance;
+        selectable = Vector2.Distance(characterPosition, mousePosition) <= maxUseDistance;
     }
 
-    private bool UseToolWorld()
+    private bool UseToolWorld()             // deteksi object di dunia pake Physics2D.OverlapCircle
     {
-        Vector3 mousePosition =
-            mainCam.ScreenToWorldPoint(Input.mousePosition);
-
+        Vector3 mousePosition = mainCam.ScreenToWorldPoint(Input.mousePosition);
         mousePosition.z = 0;
 
-        float dist =
-            Vector2.Distance(mousePosition, transform.position);
+        float dist = Vector2.Distance(mousePosition, transform.position);
+        if (dist > maxUseDistance) return false;
 
-        if (dist > maxUseDistance)
-            return false;
-
-        HotbarManager hotbar =
-            FindFirstObjectByType<HotbarManager>();
-
-        if (hotbar != null && hotbar.SelectedItem != null)
-        {
-            Debug.Log(
-                "Using item: " +
-                hotbar.SelectedItem.itemName
-            );
-        }
-
-        Vector2 aimDirection =
-            mousePosition - transform.position;
-
+        Vector2 aimDirection = mousePosition - transform.position;
         Vector2 direction;
 
         if (Mathf.Abs(aimDirection.x) > Mathf.Abs(aimDirection.y))
@@ -105,20 +84,13 @@ public class ToolsCharacterController : MonoBehaviour
         else
             direction = new Vector2(0, Mathf.Sign(aimDirection.y));
 
-        Vector2 position =
-            rb.position + offsetDistance * direction;
+        Vector2 position = rb.position + offsetDistance * direction;
 
-        Collider2D[] colliders =
-            Physics2D.OverlapCircleAll(
-                position,
-                sizeOfInteractableArea
-            );
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(position, sizeOfInteractableArea);
 
         foreach (Collider2D collider in colliders)
         {
-            ToolHit hit =
-                collider.GetComponent<ToolHit>();
-
+            ToolHit hit = collider.GetComponent<ToolHit>();
             if (hit != null)
             {
                 hit.Hit();
@@ -129,7 +101,7 @@ public class ToolsCharacterController : MonoBehaviour
         return false;
     }
 
-    private void UseToolGrid()
+    private void UseToolGrid()              // cangkul / tanam di grid tilemap
     {
         if (!selectable || cropsManager == null || groundTilemap == null) return;
 
@@ -137,13 +109,9 @@ public class ToolsCharacterController : MonoBehaviour
         TileData tileData = GetTileData(tileBase);
 
         if (cropsManager.Check(selectedTilePosition))
-        {
             cropsManager.Seed(selectedTilePosition);
-        }
         else if (tileData != null && tileData.plowable)
-        {
             cropsManager.Plow(selectedTilePosition);
-        }
     }
 
     private TileData GetTileData(TileBase tileBase)

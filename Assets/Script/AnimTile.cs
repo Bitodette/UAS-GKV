@@ -4,8 +4,8 @@ using UnityEngine.Tilemaps;
 [CreateAssetMenu(fileName = "New Anim Tile", menuName = "Tiles/Anim Tile")]
 public class AnimTile : TileBase
 {
-    public Sprite[] sprites;
-    public float speed = 1f;
+    public Sprite[] sprites;              // frame-frame animasi
+    public float speed = 1f;              // kecepatan animasi
 
     public override bool GetTileAnimationData(Vector3Int position, ITilemap tilemap, ref TileAnimationData tileAnimationData)
     {
@@ -20,6 +20,6 @@ public class AnimTile : TileBase
     public override void GetTileData(Vector3Int position, ITilemap tilemap, ref UnityEngine.Tilemaps.TileData tileData)
     {
         if (sprites != null && sprites.Length > 0)
-            tileData.sprite = sprites[0];
+            tileData.sprite = sprites[0];       // frame pertama sebagai preview
     }
 }
